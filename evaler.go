@@ -8,15 +8,14 @@
 // [1] http://en.wikipedia.org/wiki/Shunting-yard_algorithm
 // [2] http://en.wikipedia.org/wiki/Reverse_Polish_notation
 
-//package evaler
-package main
+package evaler
 
 import (
 	"evaler/stack"
 	"fmt"
 	"regexp"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 var whitespace = regexp.MustCompile(`\s+`)
@@ -55,7 +54,7 @@ func convert2postfix(tokens []string) []string {
 	for _, token := range tokens {
 
 		if isOperator(token) {
-			fmt.Printf("token %s is op\n", token)
+			//fmt.Printf("token %s is op\n", token)
 
 		OPERATOR:
 			for {
@@ -89,12 +88,12 @@ func convert2postfix(tokens []string) []string {
 			}
 
 		} else if isOperand(token) {
-			fmt.Printf("token %s is operand\n", token)
+			//fmt.Printf("token %s is operand\n", token)
 			result = append(result, token)
 		}
 
-		fmt.Printf("stack  is: %v\n", stack)
-		fmt.Printf("result is: %v\n\n", result)
+		//fmt.Printf("stack  is: %v\n", stack)
+		//fmt.Printf("result is: %v\n\n", result)
 	}
 
 	for !stack.IsEmpty() {
@@ -102,8 +101,8 @@ func convert2postfix(tokens []string) []string {
 		result = append(result, pop.(string))
 	}
 
-	fmt.Printf("stack  is: %v\n", stack)
-	fmt.Printf("result is: %v\n\n", result)
+	//fmt.Printf("stack  is: %v\n", stack)
+	//fmt.Printf("result is: %v\n\n", result)
 	return result
 }
 
@@ -136,7 +135,7 @@ func evaluatePostfix(postfix []string) float64 {
 		} else {
 			fmt.Println("Error")
 		}
-		fmt.Printf("stack: %v\n", stack)
+		//fmt.Printf("stack: %v\n", stack)
 	}
 	retval, _ := stack.Pop()
 	return retval.(float64)
@@ -150,15 +149,8 @@ func Eval(expr string) (float64, error) {
 
 	postfix := convert2postfix(tokens)
 	result := evaluatePostfix(postfix)
-	fmt.Printf("Result is: %f\n", result)
+	//fmt.Printf("Result is: %f\n", result)
 	return result, nil
-}
-
-func main() {
-	Eval(" 4  + 3 * (1 +  2) ")
-	//Eval(" 4  + 3 * 1 +  2 ")
-	//Eval(" 4  + 3 * 1  ")
-	// Eval(" 4  + 3 + 2 + 1 ")
 }
 
 // vim: tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab tw=74
