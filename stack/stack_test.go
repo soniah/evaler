@@ -14,7 +14,7 @@
 package stack_test
 
 import (
-    "evaler/stack"
+    "github.com/soniah/evaler/stack"
     "testing"
 )
 

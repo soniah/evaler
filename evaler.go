@@ -11,7 +11,7 @@
 package evaler
 
 import (
-	"evaler/stack"
+	"github.com/soniah/evaler/stack"
 	"fmt"
 	"regexp"
 	"strconv"
