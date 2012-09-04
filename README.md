@@ -9,10 +9,12 @@ implementation is adapted from a Java implementation at [3].
 
 The operators supported are: + - * / and parentheses ().
 
-This is release 0.1 - error handling and testing still needs to be added.
+This is release 0.2 - error handling and testing still needs to be added.
 
 [1] http://en.wikipedia.org/wiki/Shunting-yard_algorithm
+
 [2] http://en.wikipedia.org/wiki/Reverse_Polish_notation
+
 [3] http://willcode4beer.com/design.jsp?set=evalInfix
 
 Author
