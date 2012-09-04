@@ -14,7 +14,7 @@
 package stack_test
 
 import (
-    "shunter/stack"
+    "evaler/stack"
     "testing"
 )
 
