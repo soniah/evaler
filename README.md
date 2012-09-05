@@ -9,7 +9,8 @@ implementation is adapted from a Java implementation at [3].
 
 The operators supported are: + - * / and parentheses ().
 
-This is release 0.2 - error handling and testing still needs to be added.
+This is release 0.3 - has error handling and testing, but still needs to be
+tested in production.
 
 [1] http://en.wikipedia.org/wiki/Shunting-yard_algorithm
 
