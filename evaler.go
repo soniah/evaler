@@ -11,8 +11,9 @@
 package evaler
 
 import (
-	"github.com/soniah/evaler/stack"
 	"fmt"
+	"github.com/soniah/evaler/stack"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -48,13 +49,13 @@ func isOperand(token string) bool {
 	return fp.MatchString(token)
 }
 
+// convert2postfix converts an infix expression to postfix
 func convert2postfix(tokens []string) []string {
 	var stack stack.Stack
 	var result []string
 	for _, token := range tokens {
 
 		if isOperator(token) {
-			//fmt.Printf("token %s is op\n", token)
 
 		OPERATOR:
 			for {
@@ -88,12 +89,9 @@ func convert2postfix(tokens []string) []string {
 			}
 
 		} else if isOperand(token) {
-			//fmt.Printf("token %s is operand\n", token)
 			result = append(result, token)
 		}
 
-		//fmt.Printf("stack  is: %v\n", stack)
-		//fmt.Printf("result is: %v\n\n", result)
 	}
 
 	for !stack.IsEmpty() {
@@ -101,11 +99,10 @@ func convert2postfix(tokens []string) []string {
 		result = append(result, pop.(string))
 	}
 
-	//fmt.Printf("stack  is: %v\n", stack)
-	//fmt.Printf("result is: %v\n\n", result)
 	return result
 }
 
+// evaluatePostfix takes a postfix expression and evaluates it
 func evaluatePostfix(postfix []string) float64 {
 	var stack stack.Stack
 	var result float64
@@ -115,41 +112,65 @@ func evaluatePostfix(postfix []string) float64 {
 			fp, _ = strconv.ParseFloat(token, 64)
 			stack.Push(fp)
 		} else if isOperator(token) {
-			op1, _ := stack.Pop()
 			op2, _ := stack.Pop()
+			op1, _ := stack.Pop()
 			switch token {
 			case "*":
 				result = op1.(float64) * op2.(float64)
 				stack.Push(result)
 			case "/":
-				// TODO handle div by zero
 				result = op1.(float64) / op2.(float64)
 				stack.Push(result)
 			case "+":
 				result = op1.(float64) + op2.(float64)
 				stack.Push(result)
 			case "-":
-				result = op1.(float64) / op2.(float64)
+				result = op1.(float64) - op2.(float64)
 				stack.Push(result)
 			}
 		} else {
-			fmt.Println("Error")
+			panic("Error")
 		}
-		//fmt.Printf("stack: %v\n", stack)
 	}
 	retval, _ := stack.Pop()
 	return retval.(float64)
 }
 
-func Eval(expr string) (float64, error) {
-	fix_parens := strings.Replace(expr, "(", " ( ", -1)
-	fix_parens = strings.Replace(fix_parens, ")", " ) ", -1)
-	stripped := whitespace.ReplaceAllString(strings.TrimSpace(fix_parens), "|")
-	tokens := strings.Split(stripped, "|")
+// tokenise takes an expr string and converts it to a slice of tokens
+//
+// tokenise puts spaces around all non-numbers, removes leading and
+// trailing spaces, then splits on spaces
+//
+func tokenise(expr string) []string {
+	spaced := expr
+	symbols := []string{"(", ")", "+", "-", "*", "/"}
+	for _, symbol := range symbols {
+		spaced = strings.Replace(spaced, symbol, fmt.Sprintf(" %s ", symbol), -1)
+	}
+	stripped := whitespace.ReplaceAllString(strings.TrimSpace(spaced), "|")
+	return strings.Split(stripped, "|")
+}
 
+// Eval takes an infix string arithmetic expression, and evaluates it
+//
+// Usage:
+//   result, err := evaler.Eval("1+2")
+// Returns: the result of the evaluation, and any errors
+//
+func Eval(expr string) (result float64, err error) {
+	defer func() {
+		if e := recover(); e != nil {
+			result = float64(0.0)
+			err = fmt.Errorf("Invalid Expression: %s", expr)
+		}
+	}()
+
+	tokens := tokenise(expr)
 	postfix := convert2postfix(tokens)
-	result := evaluatePostfix(postfix)
-	//fmt.Printf("Result is: %f\n", result)
+	result = evaluatePostfix(postfix)
+	if math.IsInf(result, 0) {
+		return result, fmt.Errorf("Divide by Zero: %s", expr)
+	}
 	return result, nil
 }
 
