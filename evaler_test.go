@@ -83,4 +83,16 @@ func (s *MySuite) TestComplex3(c *C) {
 	c.Check(err, IsNil)
 }
 
+func (s *MySuite) TestExponent1(c *C) {
+	res, err := evaler.Eval("2 ** 3")
+	c.Check(res, Equals, float64(8.0))
+	c.Check(err, IsNil)
+}
+
+func (s *MySuite) TestExponent2(c *C) {
+	res, err := evaler.Eval("9.0**0.5")
+	c.Check(res, Equals, float64(3.0))
+	c.Check(err, IsNil)
+}
+
 // vim: tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab tw=74

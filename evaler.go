@@ -19,9 +19,9 @@ import (
 	"strings"
 )
 
-var whitespace = regexp.MustCompile(`\s+`)
-var fp = regexp.MustCompile(`\d+(?:\.\d)?`) // simple fp number
-var operators = "-+*/"
+var whitespace_rx = regexp.MustCompile(`\s+`)
+var fp_rx = regexp.MustCompile(`(\d+(?:\.\d)?)`) // simple fp number
+var operators = "-+**/"
 
 // prec returns the operator's precedence
 func prec(op string) int {
@@ -30,6 +30,8 @@ func prec(op string) int {
 		result = 1
 	} else if op == "*" || op == "/" {
 		result = 2
+	} else if op == "**" {
+		result = 3
 	}
 	return result
 }
@@ -46,7 +48,7 @@ func isOperator(token string) bool {
 
 // isOperand returns true if token is an operand
 func isOperand(token string) bool {
-	return fp.MatchString(token)
+	return fp_rx.MatchString(token)
 }
 
 // convert2postfix converts an infix expression to postfix
@@ -115,6 +117,9 @@ func evaluatePostfix(postfix []string) float64 {
 			op2, _ := stack.Pop()
 			op1, _ := stack.Pop()
 			switch token {
+			case "**":
+				result = math.Pow(op1.(float64), op2.(float64))
+				stack.Push(result)
 			case "*":
 				result = op1.(float64) * op2.(float64)
 				stack.Push(result)
@@ -142,12 +147,12 @@ func evaluatePostfix(postfix []string) float64 {
 // trailing spaces, then splits on spaces
 //
 func tokenise(expr string) []string {
-	spaced := expr
-	symbols := []string{"(", ")", "+", "-", "*", "/"}
+	spaced := fp_rx.ReplaceAllString(expr, " ${1} ")
+	symbols := []string{"(", ")"}
 	for _, symbol := range symbols {
 		spaced = strings.Replace(spaced, symbol, fmt.Sprintf(" %s ", symbol), -1)
 	}
-	stripped := whitespace.ReplaceAllString(strings.TrimSpace(spaced), "|")
+	stripped := whitespace_rx.ReplaceAllString(strings.TrimSpace(spaced), "|")
 	return strings.Split(stripped, "|")
 }
 
