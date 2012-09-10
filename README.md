@@ -20,7 +20,9 @@ This is release 0.4.
 Usage
 -----
 
+```go
 result, err := evaler.Eval("1+2")
+```
 
 Author
 ------
