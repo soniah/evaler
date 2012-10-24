@@ -95,4 +95,3 @@ func (s *MySuite) TestExponent2(c *C) {
 	c.Check(err, IsNil)
 }
 
-// vim: tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab tw=74
