@@ -3,7 +3,15 @@
 // Evaler uses Dijkstra's Shunting Yard algorithm [1] to convert an infix
 // expression to postfix/RPN format [2], then evaluates the RPN expression.
 //
-// The operators supported are: + - * / ** and parentheses ().
+// The operators supported are: + - * / ** parentheses () and < >
+//
+// < (less than) and > (greater than) will get lowest precedence, all
+// other precedence is as expected (BODMAS).
+//
+// < and > tests will evaluate to 0.0 for false and 1.0 for true, allowing
+// expressions like:
+// 3 * (1 < 2) -> 3.0
+// 3 * (1 > 2) -> 0.0
 //
 // [1] http://en.wikipedia.org/wiki/Shunting-yard_algorithm
 // [2] http://en.wikipedia.org/wiki/Reverse_Polish_notation
@@ -21,7 +29,7 @@ import (
 
 var whitespace_rx = regexp.MustCompile(`\s+`)
 var fp_rx = regexp.MustCompile(`(\d+(?:\.\d)?)`) // simple fp number
-var operators = "-+**/"
+var operators = "-+**/<>"
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -131,6 +139,18 @@ func evaluatePostfix(postfix []string) float64 {
 			case "-":
 				result = op1.(float64) - op2.(float64)
 				stack.Push(result)
+			case "<":
+				if op1.(float64) < op2.(float64) {
+					stack.Push(1.0)
+				} else {
+					stack.Push(0.0)
+				}
+			case ">":
+				if op1.(float64) > op2.(float64) {
+					stack.Push(1.0)
+				} else {
+					stack.Push(0.0)
+				}
 			}
 		} else {
 			panic("Error")

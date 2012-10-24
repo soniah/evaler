@@ -95,3 +95,14 @@ func (s *MySuite) TestExponent2(c *C) {
 	c.Check(err, IsNil)
 }
 
+func (s *MySuite) TestLT1(c *C) {
+	res, err := evaler.Eval("3*(2<4)")
+	c.Check(res, Equals, float64(3.0))
+	c.Check(err, IsNil)
+}
+
+func (s *MySuite) TestLT2(c *C) {
+	res, err := evaler.Eval("3*(2>4)")
+	c.Check(res, Equals, float64(0.0))
+	c.Check(err, IsNil)
+}
