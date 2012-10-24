@@ -24,8 +24,7 @@ var fp_rx = regexp.MustCompile(`(\d+(?:\.\d)?)`) // simple fp number
 var operators = "-+**/"
 
 // prec returns the operator's precedence
-func prec(op string) int {
-	result := 0
+func prec(op string) (result int) {
 	if op == "-" || op == "+" {
 		result = 1
 	} else if op == "*" || op == "/" {
@@ -33,7 +32,7 @@ func prec(op string) int {
 	} else if op == "**" {
 		result = 3
 	}
-	return result
+	return
 }
 
 // opGTE returns true if op1's precedence is >= op2
