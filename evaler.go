@@ -7,9 +7,10 @@ package evaler
 import (
 	"fmt"
 	"github.com/soniah/evaler/stack"
-	"math"
+	//"math"
+	"math/big"
 	"regexp"
-	"strconv"
+	//"strconv"
 	"strings"
 )
 
@@ -98,52 +99,72 @@ func convert2postfix(tokens []string) []string {
 }
 
 // evaluatePostfix takes a postfix expression and evaluates it
-func evaluatePostfix(postfix []string) float64 {
+func evaluatePostfix(postfix []string) (*big.Rat, error) {
 	var stack stack.Stack
-	var result float64
-	var fp float64
+	result := new(big.Rat) // note: a new(big.Rat) has value "0/1" ie zero
 	for _, token := range postfix {
+		//fmt.Println("stack start", stack)
+		//fmt.Println("got token", token)
 		if isOperand(token) {
-			fp, _ = strconv.ParseFloat(token, 64)
-			stack.Push(fp)
+			bigrat := new(big.Rat)
+			if _, err := fmt.Sscan(token, bigrat); err != nil {
+				return nil, fmt.Errorf("unable to scan %s", token)
+			}
+			stack.Push(bigrat)
 		} else if isOperator(token) {
-			op2, _ := stack.Pop()
-			op1, _ := stack.Pop()
+
+			op2, err2 := stack.Pop()
+			if err2 != nil {
+				return nil, err2
+			}
+			op1, err1 := stack.Pop()
+			if err1 != nil {
+				return nil, err1
+			}
+
+			dummy := new(big.Rat)
 			switch token {
 			case "**":
-				result = math.Pow(op1.(float64), op2.(float64))
-				stack.Push(result)
+				return nil, fmt.Errorf("unhandled exponent...") // TODO
+				//result = math.Pow(op1.(float64), op2.(float64))
+				//stack.Push(result)
 			case "*":
-				result = op1.(float64) * op2.(float64)
+				result := dummy.Mul(op1.(*big.Rat), op2.(*big.Rat))
 				stack.Push(result)
 			case "/":
-				result = op1.(float64) / op2.(float64)
+				result := dummy.Quo(op1.(*big.Rat), op2.(*big.Rat))
 				stack.Push(result)
 			case "+":
-				result = op1.(float64) + op2.(float64)
+				result = dummy.Add(op1.(*big.Rat), op2.(*big.Rat))
 				stack.Push(result)
 			case "-":
-				result = op1.(float64) - op2.(float64)
+				result = dummy.Sub(op1.(*big.Rat), op2.(*big.Rat))
 				stack.Push(result)
 			case "<":
-				if op1.(float64) < op2.(float64) {
-					stack.Push(1.0)
+				if op1.(*big.Rat).Cmp(op2.(*big.Rat)) <= -1 {
+					stack.Push(big.NewRat(1, 1))
 				} else {
-					stack.Push(0.0)
+					stack.Push(new(big.Rat))
 				}
 			case ">":
-				if op1.(float64) > op2.(float64) {
-					stack.Push(1.0)
+				if op1.(*big.Rat).Cmp(op2.(*big.Rat)) >= 1 {
+					stack.Push(big.NewRat(1, 1))
 				} else {
-					stack.Push(0.0)
+					stack.Push(new(big.Rat))
 				}
 			}
 		} else {
-			panic("Error")
+			return nil, fmt.Errorf("unknown token %v", token)
 		}
+		//fmt.Println("stack finish", stack)
+		//fmt.Println()
 	}
-	retval, _ := stack.Pop()
-	return retval.(float64)
+
+	retval, err := stack.Pop()
+	if err != nil {
+		return nil, err
+	}
+	return retval.(*big.Rat), nil
 }
 
 // tokenise takes an expr string and converts it to a slice of tokens
@@ -167,21 +188,16 @@ func tokenise(expr string) []string {
 //   result, err := evaler.Eval("1+2")
 // Returns: the result of the evaluation, and any errors
 //
-func Eval(expr string) (result float64, err error) {
+func Eval(expr string) (result *big.Rat, err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			result = float64(0.0)
+			result = nil
 			err = fmt.Errorf("Invalid Expression: %s", expr)
 		}
 	}()
 
 	tokens := tokenise(expr)
 	postfix := convert2postfix(tokens)
-	result = evaluatePostfix(postfix)
-	if math.IsInf(result, 0) {
-		return result, fmt.Errorf("Divide by Zero: %s", expr)
-	}
-	return result, nil
+	// fmt.Printf("postfix is: %s\n", postfix)
+	return evaluatePostfix(postfix)
 }
-
-// vim: tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab tw=74

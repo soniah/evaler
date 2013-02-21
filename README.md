@@ -5,9 +5,11 @@ Package evaler implements a simple fp arithmetic expression evaluator.
 
 Evaler uses Dijkstra's Shunting Yard algorithm [1] to convert an infix
 expression to postfix/RPN format [2], then evaluates the RPN expression. The
-implementation is adapted from a Java implementation at [3].
+implementation is adapted from a Java implementation at [3]. The results are
+returned as a `math/big *big.Rat`.
 
-This is release 1.0.
+This is release 2.0. The previous version that returned results as float64
+is in the branch float64.
 
 Usage
 -----
