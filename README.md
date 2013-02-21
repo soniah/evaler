@@ -36,6 +36,12 @@ expressions like:
 3 * (1 > 2) # returns 0.0
 ```
 
+Issues
+------
+
+The 2.0 release currently doesn't support exponents (** operator). This
+is WIP (work in progress).
+
 Author
 ------
 
