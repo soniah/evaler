@@ -43,6 +43,11 @@ http://www.snowfrog.net
 
 sonia@snowfrog.net
 
+License
+-------
+
+Modified BSD License (BSD-3)
+
 Links
 -----
 
