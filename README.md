@@ -44,6 +44,14 @@ for big.Rat numbers is non-trivial. As a work around, arguments are converted
 to float64's, the calculation is done using the math.Pow() function, the
 result is converted to a big.Rat and placed back on the stack.
 
+Documentation
+-------------
+
+http://godoc.org/github.com/soniah/evaler
+
+There are also a number of utility functions (eg BigratToFloat(),
+BigratToInt()) that may be useful when working with evaler.
+
 Author
 ------
 
