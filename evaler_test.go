@@ -2,11 +2,14 @@ package evaler_test
 
 import (
 	"github.com/soniah/evaler"
+	"math"
 	"math/big"
 	"testing"
 )
 
-var simpleArithTests = []struct {
+// -----------------------------------------------------------------------------
+
+var testsEval = []struct {
 	in  string
 	out *big.Rat
 	ok  bool
@@ -25,10 +28,12 @@ var simpleArithTests = []struct {
 	{"3*(2<4)", big.NewRat(3, 1), true},          // less than
 	{"3*(2>4)", new(big.Rat), true},              // greater than
 	{"5 / 0", nil, false},                        // divide by zero
+	{"2 ** 3", big.NewRat(8, 1), true},           // exponent 1
+	{"9.0**0.5", big.NewRat(3, 1), true},         // exponent 2
 }
 
-func TestSimpleArith(t *testing.T) {
-	for i, test := range simpleArithTests {
+func TestEval(t *testing.T) {
+	for i, test := range testsEval {
 		ret, err := evaler.Eval(test.in)
 		if ret == nil && test.out == nil {
 			// ok, do nothing
@@ -43,18 +48,87 @@ func TestSimpleArith(t *testing.T) {
 	}
 }
 
-/*
+// -----------------------------------------------------------------------------
 
-func (s *MySuite) TestExponent1(c *C) {
-	res, err := evaler.Eval("2 ** 3")
-	c.Check(res, Equals, float64(8.0))
-	c.Check(err, IsNil)
+var testsBigratToInt = []struct {
+	in  *big.Rat
+	out int64
+	ok  bool
+}{
+	{big.NewRat(4, 2), int64(2), true},
+	{big.NewRat(5, 2), int64(3), true},
+	{big.NewRat(-4, 2), int64(-2), true},
+	{new(big.Rat).Mul(big.NewRat(math.MaxInt64, 1), big.NewRat(math.MaxInt64, 1)), int64(0), false},
 }
 
-func (s *MySuite) TestExponent2(c *C) {
-	res, err := evaler.Eval("9.0**0.5")
-	c.Check(res, Equals, float64(3.0))
-	c.Check(err, IsNil)
+func TestBigratToInt(t *testing.T) {
+	for i, test := range testsBigratToInt {
+		ret, err := evaler.BigratToInt(test.in)
+		if test.ok && (ret != test.out) {
+			t.Errorf("#%d: got %d expected %d", i, ret, test.out)
+		}
+		if (err == nil) != test.ok {
+			t.Errorf("#%d: %s: unexpected err result: %t vs %t", i, test.in, (err == nil), test.ok)
+		}
+	}
 }
 
-*/
+// -----------------------------------------------------------------------------
+
+var testsBigratToBigint = []struct {
+	in  *big.Rat
+	out *big.Int
+}{
+	{big.NewRat(4, 2), big.NewInt(2)},
+	{big.NewRat(5, 2), big.NewInt(3)},
+	{big.NewRat(-4, 2), big.NewInt(-2)},
+}
+
+func TestBigratToBigint(t *testing.T) {
+	for i, test := range testsBigratToBigint {
+		ret := evaler.BigratToBigint(test.in)
+		if ret.Cmp(test.out) != 0 {
+			t.Errorf("#%d: got %d expected %d", i, ret, test.out)
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+var testsBigratToFloat = []struct {
+	in  *big.Rat
+	out float64
+}{
+	{big.NewRat(4, 2), float64(2.0)},
+	{big.NewRat(5, 2), float64(2.5)},
+	{big.NewRat(-4, 2), float64(-2.0)},
+}
+
+func TestBigratToFloat(t *testing.T) {
+	for i, test := range testsBigratToFloat {
+		ret := evaler.BigratToFloat(test.in)
+		if ret != test.out {
+			t.Errorf("#%d: got %d expected %d", i, ret, test.out)
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+var testsFloatToBigrat = []struct {
+	in  float64
+	out *big.Rat
+}{
+	{float64(2.0), big.NewRat(4, 2)},
+	{float64(2.5), big.NewRat(5, 2)},
+	{float64(-2.0), big.NewRat(-4, 2)},
+}
+
+func TestFloatToBigrat(t *testing.T) {
+	for i, test := range testsFloatToBigrat {
+		ret := evaler.FloatToBigrat(test.in)
+		if ret.Cmp(test.out) != 0 {
+			t.Errorf("#%d: got %s expected %s", i, ret, test.out)
+		}
+	}
+}

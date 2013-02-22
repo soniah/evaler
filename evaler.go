@@ -7,10 +7,10 @@ package evaler
 import (
 	"fmt"
 	"github.com/soniah/evaler/stack"
-	//"math"
+	"math"
 	"math/big"
 	"regexp"
-	//"strconv"
+	"strconv"
 	"strings"
 )
 
@@ -103,8 +103,6 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 	var stack stack.Stack
 	result := new(big.Rat) // note: a new(big.Rat) has value "0/1" ie zero
 	for _, token := range postfix {
-		//fmt.Println("stack start", stack)
-		//fmt.Println("got token", token)
 		if isOperand(token) {
 			bigrat := new(big.Rat)
 			if _, err := fmt.Sscan(token, bigrat); err != nil {
@@ -125,9 +123,10 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 			dummy := new(big.Rat)
 			switch token {
 			case "**":
-				return nil, fmt.Errorf("unhandled exponent...") // TODO
-				//result = math.Pow(op1.(float64), op2.(float64))
-				//stack.Push(result)
+				float1 := BigratToFloat(op1.(*big.Rat))
+				float2 := BigratToFloat(op2.(*big.Rat))
+				float_result := math.Pow(float1, float2)
+				stack.Push(FloatToBigrat(float_result))
 			case "*":
 				result := dummy.Mul(op1.(*big.Rat), op2.(*big.Rat))
 				stack.Push(result)
@@ -156,8 +155,6 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 		} else {
 			return nil, fmt.Errorf("unknown token %v", token)
 		}
-		//fmt.Println("stack finish", stack)
-		//fmt.Println()
 	}
 
 	retval, err := stack.Pop()
@@ -198,6 +195,39 @@ func Eval(expr string) (result *big.Rat, err error) {
 
 	tokens := tokenise(expr)
 	postfix := convert2postfix(tokens)
-	// fmt.Printf("postfix is: %s\n", postfix)
 	return evaluatePostfix(postfix)
+}
+
+// BigratToInt converts a *big.Rat to an int64 (with truncation); it
+// returns an error for integer overflows.
+func BigratToInt(bigrat *big.Rat) (int64, error) {
+	float_string := bigrat.FloatString(0)
+	return strconv.ParseInt(float_string, 10, 64)
+}
+
+// BigratToInt converts a *big.Rat to a *big.Int (with truncation)
+func BigratToBigint(bigrat *big.Rat) *big.Int {
+	int_string := bigrat.FloatString(0)
+	bigint := new(big.Int)
+	// no error scenario could be imagined in testing, so discard err
+	fmt.Sscan(int_string, bigint)
+	return bigint
+}
+
+// BigratToFloat converts a *big.Rat to a float64 (with loss of
+// precision).
+func BigratToFloat(bigrat *big.Rat) float64 {
+	float_string := bigrat.FloatString(10) // arbitrary largish precision
+	// no error scenario could be imagined in testing, so discard err
+	float, _ := strconv.ParseFloat(float_string, 64)
+	return float
+}
+
+// FloatToBigrat converts a float64 to a *big.Rat.
+func FloatToBigrat(float float64) *big.Rat {
+	float_string := fmt.Sprintf("%g", float)
+	bigrat := new(big.Rat)
+	// no error scenario could be imagined in testing, so discard err
+	fmt.Sscan(float_string, bigrat)
+	return bigrat
 }

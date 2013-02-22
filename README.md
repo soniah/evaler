@@ -39,8 +39,10 @@ expressions like:
 Issues
 ------
 
-The 2.0 release currently doesn't support exponents (** operator). This
-is WIP (work in progress).
+The math/big library doesn't have an exponent function (**), and implenting one
+for big.Rat numbers is non-trivial. As a work around, arguments are converted
+to float64's, the calculation is done using the math.Pow() function, the
+result is converted to a big.Rat and placed back on the stack.
 
 Author
 ------
