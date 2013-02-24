@@ -7,7 +7,7 @@ Evaler uses Dijkstra's Shunting Yard algorithm [1] to convert an infix
 expression to postfix/RPN format [2], then evaluates the RPN expression. The
 implementation is adapted from a Java implementation at [3].
 
-This is release 1.0.
+This is release 1.1.
 
 Usage
 -----

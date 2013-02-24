@@ -44,25 +44,25 @@ func (s *MySuite) TestDivideZero(c *C) {
 func (s *MySuite) TestLetters1(c *C) {
 	res, err := evaler.Eval("U + U")
 	c.Check(res, Equals, float64(0.0))
-	c.Check(err, ErrorMatches, "Invalid Expression:.*")
+	c.Check(err, ErrorMatches, ".*an empty stack.*")
 }
 
 func (s *MySuite) TestLetters2(c *C) {
 	res, err := evaler.Eval("2 + U")
 	c.Check(res, Equals, float64(0.0))
-	c.Check(err, ErrorMatches, "Invalid Expression:.*")
+	c.Check(err, ErrorMatches, ".*an empty stack.*")
 }
 
 func (s *MySuite) TestBrokenExpr1(c *C) {
 	res, err := evaler.Eval("2 + ")
 	c.Check(res, Equals, float64(0.0))
-	c.Check(err, ErrorMatches, "Invalid Expression:.*")
+	c.Check(err, ErrorMatches, ".*an empty stack.*")
 }
 
 func (s *MySuite) TestBrokenExpr2(c *C) {
 	res, err := evaler.Eval("+ 2 - + * ")
 	c.Check(res, Equals, float64(0.0))
-	c.Check(err, ErrorMatches, "Invalid Expression:.*")
+	c.Check(err, ErrorMatches, ".*an empty stack.*")
 }
 
 func (s *MySuite) TestComplex1(c *C) {

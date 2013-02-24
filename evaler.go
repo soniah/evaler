@@ -98,17 +98,24 @@ func convert2postfix(tokens []string) []string {
 }
 
 // evaluatePostfix takes a postfix expression and evaluates it
-func evaluatePostfix(postfix []string) float64 {
+func evaluatePostfix(postfix []string) (result float64, err error) {
 	var stack stack.Stack
-	var result float64
 	var fp float64
 	for _, token := range postfix {
 		if isOperand(token) {
-			fp, _ = strconv.ParseFloat(token, 64)
+			if fp, err = strconv.ParseFloat(token, 64); err != nil {
+				return float64(0.0), err
+			}
 			stack.Push(fp)
 		} else if isOperator(token) {
-			op2, _ := stack.Pop()
-			op1, _ := stack.Pop()
+			op2, err2 := stack.Pop()
+			if err2 != nil {
+				return float64(0.0), err2
+			}
+			op1, err1 := stack.Pop()
+			if err1 != nil {
+				return float64(0.0), err1
+			}
 			switch token {
 			case "**":
 				result = math.Pow(op1.(float64), op2.(float64))
@@ -139,11 +146,15 @@ func evaluatePostfix(postfix []string) float64 {
 				}
 			}
 		} else {
-			panic("Error")
+			return float64(0.0), fmt.Errorf("unknown token %v", token)
 		}
 	}
-	retval, _ := stack.Pop()
-	return retval.(float64)
+
+	retval, err := stack.Pop()
+	if err != nil {
+		return float64(0.0), err
+	}
+	return retval.(float64), nil
 }
 
 // tokenise takes an expr string and converts it to a slice of tokens
@@ -177,11 +188,9 @@ func Eval(expr string) (result float64, err error) {
 
 	tokens := tokenise(expr)
 	postfix := convert2postfix(tokens)
-	result = evaluatePostfix(postfix)
+	result, err = evaluatePostfix(postfix)
 	if math.IsInf(result, 0) {
-		return result, fmt.Errorf("Divide by Zero: %s", expr)
+		return float64(0.0), fmt.Errorf("Divide by Zero: %s", expr)
 	}
-	return result, nil
+	return result, err
 }
-
-// vim: tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab tw=74
