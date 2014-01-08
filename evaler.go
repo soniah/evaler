@@ -15,7 +15,7 @@ import (
 )
 
 var whitespace_rx = regexp.MustCompile(`\s+`)
-var fp_rx = regexp.MustCompile(`(\d+(?:\.\d)?)`) // simple fp number
+var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
 var operators = "-+**/<>"
 
 // prec returns the operator's precedence
@@ -176,6 +176,7 @@ func tokenise(expr string) []string {
 		spaced = strings.Replace(spaced, symbol, fmt.Sprintf(" %s ", symbol), -1)
 	}
 	stripped := whitespace_rx.ReplaceAllString(strings.TrimSpace(spaced), "|")
+	fmt.Println(stripped)
 	return strings.Split(stripped, "|")
 }
 

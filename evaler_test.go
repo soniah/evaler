@@ -30,6 +30,7 @@ var testsEval = []struct {
 	{"5 / 0", nil, false},                        // divide by zero
 	{"2 ** 3", big.NewRat(8, 1), true},           // exponent 1
 	{"9.0**0.5", big.NewRat(3, 1), true},         // exponent 2
+	{"1.23", big.NewRat(123, 100), true},
 }
 
 func TestEval(t *testing.T) {
