@@ -176,7 +176,6 @@ func tokenise(expr string) []string {
 		spaced = strings.Replace(spaced, symbol, fmt.Sprintf(" %s ", symbol), -1)
 	}
 	stripped := whitespace_rx.ReplaceAllString(strings.TrimSpace(spaced), "|")
-	fmt.Println(stripped)
 	return strings.Split(stripped, "|")
 }
 
