@@ -1,6 +1,11 @@
 evaler
 ======
 
+[![Build Status](https://travis-ci.org/soniah/evaler.svg?branch=master)](https://travis-ci.org/soniah/evaler)
+[![Coverage](http://gocover.io/_badge/github.com/soniah/evaler)](http://gocover.io/github.com/soniah/evaler)
+[![GoDoc](https://godoc.org/github.com/soniah/evaler?status.png)](http://godoc.org/github.com/soniah/evaler)
+https://github.com/soniah/evaler
+
 Package evaler implements a simple fp arithmetic expression evaluator.
 
 Evaler uses Dijkstra's Shunting Yard algorithm [1] to convert an infix
@@ -36,6 +41,8 @@ expressions like:
 3 * (1 > 2) # returns 0.0
 ```
 
+Minus implements both binary and unary operations (thanks @hiroxy).
+
 Issues
 ------
 
@@ -57,7 +64,7 @@ Author
 
 Sonia Hamilton
 
-http://www.snowfrog.net
+http://blog.snowfrog.net
 
 sonia@snowfrog.net
 
