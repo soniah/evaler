@@ -6,17 +6,25 @@ package evaler
 
 import (
 	"fmt"
-	"github.com/soniah/evaler/stack"
 	"math"
 	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/soniah/evaler/stack"
 )
 
 var whitespace_rx = regexp.MustCompile(`\s+`)
+
+// Unary minus is appeared at the following positions.
+//     * the beginning of an expression
+//     * after an operator or '('
+var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
 var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
-var operators = "-+**/<>"
+
+// Operator '@' means unary minus
+var operators = "-+**/<>@"
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -26,6 +34,8 @@ func prec(op string) (result int) {
 		result = 2
 	} else if op == "**" {
 		result = 3
+	} else if op == "@" {
+		result = 4
 	}
 	return
 }
@@ -115,9 +125,13 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 			if err2 != nil {
 				return nil, err2
 			}
-			op1, err1 := stack.Pop()
-			if err1 != nil {
-				return nil, err1
+
+			var op1 interface{}
+			if token != "@" {
+				var err1 error
+				if op1, err1 = stack.Pop(); err1 != nil {
+					return nil, err1
+				}
 			}
 
 			dummy := new(big.Rat)
@@ -151,6 +165,9 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 				} else {
 					stack.Push(new(big.Rat))
 				}
+			case "@":
+				result := dummy.Mul(big.NewRat(-1, 1), op2.(*big.Rat))
+				stack.Push(result)
 			}
 		} else {
 			return nil, fmt.Errorf("unknown token %v", token)
@@ -170,7 +187,8 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 // trailing spaces, then splits on spaces
 //
 func tokenise(expr string) []string {
-	spaced := fp_rx.ReplaceAllString(expr, " ${1} ")
+	spaced := unary_minus_rx.ReplaceAllString(expr, "$1 @")
+	spaced = fp_rx.ReplaceAllString(spaced, " ${1} ")
 	symbols := []string{"(", ")"}
 	for _, symbol := range symbols {
 		spaced = strings.Replace(spaced, symbol, fmt.Sprintf(" %s ", symbol), -1)
