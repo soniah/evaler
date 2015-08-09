@@ -6,7 +6,7 @@ evaler
 [![GoDoc](https://godoc.org/github.com/soniah/evaler?status.png)](http://godoc.org/github.com/soniah/evaler)
 https://github.com/soniah/evaler
 
-Package evaler implements a simple fp arithmetic expression evaluator.
+Package evaler implements a simple floating point arithmetic expression evaluator.
 
 Evaler uses Dijkstra's Shunting Yard algorithm [1] to convert an infix
 expression to postfix/RPN format [2], then evaluates the RPN expression. The
