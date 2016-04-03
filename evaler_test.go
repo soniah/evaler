@@ -28,6 +28,10 @@ var testsEval = []struct {
 	{"(1+(2))*(5-2.5)", big.NewRat(15, 2), true}, // complex 3
 	{"3*(2<4)", big.NewRat(3, 1), true},          // less than
 	{"3*(2>4)", new(big.Rat), true},              // greater than
+	{"3+5 == 8", big.NewRat(1, 1), true},         // equals match
+	{"4+5 == 8", new(big.Rat), true},             // equals no-match
+	{"3+5 != 8", new(big.Rat), true},             // not-equals match
+	{"4+5 != 8", big.NewRat(1, 1), true},         // not-equals no-match
 	{"5 / 0", nil, false},                        // divide by zero
 	{"2 ** 3", big.NewRat(8, 1), true},           // exponent 1
 	{"9.0**0.5", big.NewRat(3, 1), true},         // exponent 2
