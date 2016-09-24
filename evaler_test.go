@@ -37,6 +37,11 @@ var testsEval = []struct {
 	{"4/(-1+3)", big.NewRat(2, 1), true},      // unary minus (after '(' )
 	{"-(-1+2)--2**3", big.NewRat(7, 1), true}, // unary minus (complex)
 	{"sin(1)", big.NewRat(1682941969615793, 2000000000000000), true}, // simple sin
+	{"sin(1)+1", big.NewRat(3682941969615793, 2000000000000000), true}, // sin in an expression
+	{"sin(1)+2**2", big.NewRat(9682941969615793, 2000000000000000), true}, // sin in more complex expression
+	{"sin(2-1)", big.NewRat(1682941969615793, 2000000000000000), true}, // sin of expression
+	{"sin(2**2)", big.NewRat(-3784012476539641, 5000000000000000), true}, // sin of expression
+	// {"1+sin(1)", big.NewRat(3682941969615793, 2000000000000000), true}, // THIS IS A BUG AND SHOULD NOT BREAK
 	{"cos(1)", big.NewRat(2701511529340699, 5000000000000000), true}, // simple sin
 	{"tan(1)", big.NewRat(778703862327451, 500000000000000), true}, // simple tan
 	{".5 * 2", big.NewRat(1, 1), true},        // no leading zero
