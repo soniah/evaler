@@ -22,6 +22,8 @@ var whitespace_rx = regexp.MustCompile(`\s+`)
 //     * after an operator or '('
 var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
 var fp_rx = regexp.MustCompile(`(\d*\.?\d+)`) // simple fp number
+var symbols map[string]string
+var symbols_rx *regexp.Regexp
 
 // Operator '@' means unary minus
 var operators = "-+**/<>@sincostan"
@@ -53,6 +55,15 @@ func isOperator(token string) bool {
 // isOperand returns true if token is an operand
 func isOperand(token string) bool {
 	return fp_rx.MatchString(token)
+}
+
+func isSymbol(token string) bool {
+	for k := range symbols {
+		if k == token {
+			return true
+		}
+	}
+	return false
 }
 
 // convert2postfix converts an infix expression to postfix
@@ -96,8 +107,9 @@ func convert2postfix(tokens []string) []string {
 
 		} else if isOperand(token) {
 			result = append(result, token)
+		} else if isSymbol(token) {
+			result = append(result, symbols[token])
 		}
-
 	}
 
 	for !stack.IsEmpty() {
@@ -198,6 +210,9 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 func tokenise(expr string) []string {
 	spaced := unary_minus_rx.ReplaceAllString(expr, "$1 @")
 	spaced = fp_rx.ReplaceAllString(spaced, " ${1} ")
+	if symbols_rx != nil {
+		spaced = symbols_rx.ReplaceAllString(spaced, " ${1} ")
+	}
 	symbols := []string{"(", ")"}
 	for _, symbol := range symbols {
 		spaced = strings.Replace(spaced, symbol, fmt.Sprintf(" %s ", symbol), -1)
@@ -223,6 +238,15 @@ func Eval(expr string) (result *big.Rat, err error) {
 	tokens := tokenise(expr)
 	postfix := convert2postfix(tokens)
 	return evaluatePostfix(postfix)
+}
+func EvalWithVariables(expr string, variables map[string]string) (result *big.Rat, err error) {
+	symbols = variables
+	s := ""
+	for k := range symbols {
+		s += k
+	}
+	symbols_rx = regexp.MustCompile(fmt.Sprintf("(%s)", s))
+	return Eval(expr)
 }
 
 // BigratToInt converts a *big.Rat to an int64 (with truncation); it
