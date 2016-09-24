@@ -39,6 +39,9 @@ var testsEval = []struct {
 	{"sin(1)", big.NewRat(1682941969615793, 2000000000000000), true}, // simple sin
 	{"cos(1)", big.NewRat(2701511529340699, 5000000000000000), true}, // simple sin
 	{"tan(1)", big.NewRat(778703862327451, 500000000000000), true}, // simple tan
+	{".5 * 2", big.NewRat(1, 1), true},        // no leading zero
+	{"1. * 2", big.NewRat(2, 1), true},        // no trailing numbers
+	{". * 2", nil, false},                     // decimal, but no numbers at all
 }
 
 func TestEval(t *testing.T) {
