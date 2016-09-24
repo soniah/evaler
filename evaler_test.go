@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/dem-waffles/evaler"
+	"github.com/soniah/evaler"
 )
 
 // -----------------------------------------------------------------------------
