@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/soniah/evaler/stack"
+	"github.com/dem-waffles/evaler/stack"
 )
 
 var whitespace_rx = regexp.MustCompile(`\s+`)
@@ -24,7 +24,7 @@ var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
 var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
 
 // Operator '@' means unary minus
-var operators = "-+**/<>@"
+var operators = "-+**/<>@sincostan"
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -34,7 +34,7 @@ func prec(op string) (result int) {
 		result = 2
 	} else if op == "**" {
 		result = 3
-	} else if op == "@" {
+	} else if op == "@" || op == "sin" {
 		result = 4
 	}
 	return
@@ -127,7 +127,7 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 			}
 
 			var op1 interface{}
-			if token != "@" {
+			if token != "@" && token != "sin" && token != "tan" && token != "cos" {
 				var err1 error
 				if op1, err1 = stack.Pop(); err1 != nil {
 					return nil, err1
@@ -168,6 +168,15 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 			case "@":
 				result := dummy.Mul(big.NewRat(-1, 1), op2.(*big.Rat))
 				stack.Push(result)
+			case "sin":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Sin(float_result)))
+			case "cos":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Cos(float_result)))
+			case "tan":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Tan(float_result)))
 			}
 		} else {
 			return nil, fmt.Errorf("unknown token %v", token)

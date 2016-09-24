@@ -4,8 +4,7 @@ import (
 	"math"
 	"math/big"
 	"testing"
-
-	"github.com/soniah/evaler"
+	"github.com/dem-waffles/evaler"
 )
 
 // -----------------------------------------------------------------------------
@@ -31,11 +30,15 @@ var testsEval = []struct {
 	{"5 / 0", nil, false},                        // divide by zero
 	{"2 ** 3", big.NewRat(8, 1), true},           // exponent 1
 	{"9.0**0.5", big.NewRat(3, 1), true},         // exponent 2
+	{"4**-1", big.NewRat(1, 4), true},            // exponent 3
 	{"1.23", big.NewRat(123, 100), true},
 	{"-1+2", big.NewRat(1, 1), true},          // unary minus (the beginning of a expression)
 	{"3*-4", big.NewRat(-12, 1), true},        // unary minus (after an operator)
 	{"4/(-1+3)", big.NewRat(2, 1), true},      // unary minus (after '(' )
 	{"-(-1+2)--2**3", big.NewRat(7, 1), true}, // unary minus (complex)
+	{"sin(1)", big.NewRat(1682941969615793, 2000000000000000), true}, // simple sin
+	{"cos(1)", big.NewRat(2701511529340699, 5000000000000000), true}, // simple sin
+	{"tan(1)", big.NewRat(778703862327451, 500000000000000), true}, // simple tan
 }
 
 func TestEval(t *testing.T) {
@@ -138,3 +141,4 @@ func TestFloatToBigrat(t *testing.T) {
 		}
 	}
 }
+
