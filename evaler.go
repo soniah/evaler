@@ -22,11 +22,14 @@ var whitespace_rx = regexp.MustCompile(`\s+`)
 //     * after an operator or '('
 var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
 var fp_rx = regexp.MustCompile(`(\d*\.?\d+)`) // simple fp number
-var symbols map[string]string
+var symbolTable map[string]string
 var symbols_rx *regexp.Regexp
 
 // Operator '@' means unary minus
-var operators = "-+**/<>@sincostan"
+var operators = "-+**/<>@"
+
+var functions = "sincostan"
+var functions_rx = regexp.MustCompile(`(sin|cos|tan)`)
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -36,8 +39,10 @@ func prec(op string) (result int) {
 		result = 2
 	} else if op == "**" {
 		result = 3
-	} else if op == "@" || op == "sin" {
+	} else if op == "@" {
 		result = 4
+	} else if strings.Contains(functions, op) {
+		result = 5
 	}
 	return
 }
@@ -47,6 +52,9 @@ func opGTE(op1, op2 string) bool {
 	return prec(op1) >= prec(op2)
 }
 
+func isFunction(token string) bool {
+	return strings.Contains(functions, token)
+}
 // isOperator returns true if token is an operator
 func isOperator(token string) bool {
 	return strings.Contains(operators, token)
@@ -58,7 +66,7 @@ func isOperand(token string) bool {
 }
 
 func isSymbol(token string) bool {
-	for k := range symbols {
+	for k := range symbolTable {
 		if k == token {
 			return true
 		}
@@ -71,10 +79,8 @@ func convert2postfix(tokens []string) []string {
 	var stack stack.Stack
 	var result []string
 	for _, token := range tokens {
-
 		if isOperator(token) {
-
-		OPERATOR:
+			OPERATOR:
 			for {
 				top, err := stack.Top()
 				if err == nil && top != "(" {
@@ -88,12 +94,26 @@ func convert2postfix(tokens []string) []string {
 				break OPERATOR
 			}
 			stack.Push(token)
-
+		} else if isFunction(token) {
+			FUNCTION:
+			for {
+				top, err := stack.Top()
+				if err == nil && top != "(" {
+					if opGTE(top.(string), token) {
+						pop, _ := stack.Pop()
+						result = append(result, pop.(string))
+					}
+				} else {
+					break FUNCTION
+				}
+				break FUNCTION
+			}
+			stack.Push(token)
 		} else if token == "(" {
 			stack.Push(token)
 
 		} else if token == ")" {
-		PAREN:
+			PAREN:
 			for {
 				top, err := stack.Top()
 				if err == nil && top != "(" {
@@ -108,7 +128,7 @@ func convert2postfix(tokens []string) []string {
 		} else if isOperand(token) {
 			result = append(result, token)
 		} else if isSymbol(token) {
-			result = append(result, symbols[token])
+			result = append(result, symbolTable[token])
 		}
 	}
 
@@ -139,7 +159,7 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 			}
 
 			var op1 interface{}
-			if token != "@" && token != "sin" && token != "tan" && token != "cos" {
+			if token != "@" {
 				var err1 error
 				if op1, err1 = stack.Pop(); err1 != nil {
 					return nil, err1
@@ -180,6 +200,13 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 			case "@":
 				result := dummy.Mul(big.NewRat(-1, 1), op2.(*big.Rat))
 				stack.Push(result)
+			}
+		} else if isFunction(token) {
+			op2, err := stack.Pop()
+			if err != nil {
+				return nil, err
+			}
+			switch token {
 			case "sin":
 				float_result := BigratToFloat(op2.(*big.Rat))
 				stack.Push(FloatToBigrat(math.Sin(float_result)))
@@ -210,6 +237,7 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 func tokenise(expr string) []string {
 	spaced := unary_minus_rx.ReplaceAllString(expr, "$1 @")
 	spaced = fp_rx.ReplaceAllString(spaced, " ${1} ")
+	spaced = functions_rx.ReplaceAllString(spaced, " ${1} ")
 	if symbols_rx != nil {
 		spaced = symbols_rx.ReplaceAllString(spaced, " ${1} ")
 	}
@@ -240,9 +268,9 @@ func Eval(expr string) (result *big.Rat, err error) {
 	return evaluatePostfix(postfix)
 }
 func EvalWithVariables(expr string, variables map[string]string) (result *big.Rat, err error) {
-	symbols = variables
+	symbolTable = variables
 	s := ""
-	for k := range symbols {
+	for k := range symbolTable {
 		s += k
 	}
 	symbols_rx = regexp.MustCompile(fmt.Sprintf("(%s)", s))
