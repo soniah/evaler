@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/soniah/evaler"
+	"github.com/dem-waffles/evaler"
 )
 
 // -----------------------------------------------------------------------------
@@ -36,11 +36,50 @@ var testsEval = []struct {
 	{"3*-4", big.NewRat(-12, 1), true},        // unary minus (after an operator)
 	{"4/(-1+3)", big.NewRat(2, 1), true},      // unary minus (after '(' )
 	{"-(-1+2)--2**3", big.NewRat(7, 1), true}, // unary minus (complex)
+	{".5 * 2", big.NewRat(1, 1), true},        // no leading zero
+	{"1. * 2", big.NewRat(2, 1), true},        // no trailing numbers
+	{". * 2", nil, false},                     // decimal, but no numbers at all
 }
+
 
 func TestEval(t *testing.T) {
 	for i, test := range testsEval {
 		ret, err := evaler.Eval(test.in)
+		if ret == nil && test.out == nil {
+			// ok, do nothing
+		} else if ret == nil || test.out == nil {
+			t.Errorf("#%d: %s: unexpected nil result: %v vs %v", i, test.in, ret, test.out)
+		} else if ret.Cmp(test.out) != 0 {
+			t.Errorf("#%d: %s: bad result: got %v expected %v", i, test.in, ret, test.out)
+		}
+		if (err == nil) != test.ok {
+			t.Errorf("#%d: %s: unexpected err result: %t vs %t", i, test.in, (err == nil), test.ok)
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+var testsEvalSymbols = []struct {
+	in        string
+	variables map[string]string
+	out       *big.Rat
+	ok        bool
+}{
+	{"x", map[string]string{"x": "5"}, big.NewRat(5, 1), true},                                     // simple substitution
+	{"x + 1", map[string]string{"x": "5"}, big.NewRat(6, 1), true},                                 // basic addition
+	{"2*x", map[string]string{"x": "2"}, big.NewRat(4, 1), true},                                   // moderate
+	{"x**x", map[string]string{"x": "2"}, big.NewRat(4, 1), true},                                  // more complex
+	{"1**x", map[string]string{"x": "100"}, big.NewRat(1, 1), true},                                // sanity
+	{"9**x", map[string]string{"x": "-.5"}, big.NewRat(3333333333333333, 10000000000000000), true}, // basic negative value passed in for variable
+	{"9**-x", map[string]string{"x": ".5"}, big.NewRat(3333333333333333, 10000000000000000), true}, // negative of variable
+	{"t", map[string]string{"t": "5"}, big.NewRat(5, 1), true},                                     // test variables that could be misinterpreted as operators
+	{"x", map[string]string{"t": "5"}, nil, false},                                                 // unassigned variable
+}
+
+func TestEvalWithVariables(t *testing.T) {
+	for i, test := range testsEvalSymbols {
+		ret, err := evaler.EvalWithVariables(test.in, test.variables)
 		if ret == nil && test.out == nil {
 			// ok, do nothing
 		} else if ret == nil || test.out == nil {
