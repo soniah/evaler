@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/soniah/evaler/stack"
+	"github.com/dem-waffles/evaler/stack"
 )
 
 var whitespace_rx = regexp.MustCompile(`\s+`)
@@ -21,10 +21,15 @@ var whitespace_rx = regexp.MustCompile(`\s+`)
 //     * the beginning of an expression
 //     * after an operator or '('
 var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
-var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
+var fp_rx = regexp.MustCompile(`(\d*\.?\d+)`) // simple fp number
+var symbolTable map[string]string
+var symbols_rx *regexp.Regexp
 
 // Operator '@' means unary minus
 var operators = "-+**/<>@"
+
+var functions = "sincostan"
+var functions_rx = regexp.MustCompile(`(sin|cos|tan)`)
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -36,6 +41,8 @@ func prec(op string) (result int) {
 		result = 3
 	} else if op == "@" {
 		result = 4
+	} else if strings.Contains(functions, op) {
+		result = 5
 	}
 	return
 }
@@ -45,6 +52,9 @@ func opGTE(op1, op2 string) bool {
 	return prec(op1) >= prec(op2)
 }
 
+func isFunction(token string) bool {
+	return strings.Contains(functions, token)
+}
 // isOperator returns true if token is an operator
 func isOperator(token string) bool {
 	return strings.Contains(operators, token)
@@ -55,15 +65,22 @@ func isOperand(token string) bool {
 	return fp_rx.MatchString(token)
 }
 
+func isSymbol(token string) bool {
+	for k := range symbolTable {
+		if k == token {
+			return true
+		}
+	}
+	return false
+}
+
 // convert2postfix converts an infix expression to postfix
 func convert2postfix(tokens []string) []string {
 	var stack stack.Stack
 	var result []string
 	for _, token := range tokens {
-
 		if isOperator(token) {
-
-		OPERATOR:
+			OPERATOR:
 			for {
 				top, err := stack.Top()
 				if err == nil && top != "(" {
@@ -77,12 +94,26 @@ func convert2postfix(tokens []string) []string {
 				break OPERATOR
 			}
 			stack.Push(token)
-
+		} else if isFunction(token) {
+			FUNCTION:
+			for {
+				top, err := stack.Top()
+				if err == nil && top != "(" {
+					if opGTE(top.(string), token) {
+						pop, _ := stack.Pop()
+						result = append(result, pop.(string))
+					}
+				} else {
+					break FUNCTION
+				}
+				break FUNCTION
+			}
+			stack.Push(token)
 		} else if token == "(" {
 			stack.Push(token)
 
 		} else if token == ")" {
-		PAREN:
+			PAREN:
 			for {
 				top, err := stack.Top()
 				if err == nil && top != "(" {
@@ -96,8 +127,9 @@ func convert2postfix(tokens []string) []string {
 
 		} else if isOperand(token) {
 			result = append(result, token)
+		} else if isSymbol(token) {
+			result = append(result, symbolTable[token])
 		}
-
 	}
 
 	for !stack.IsEmpty() {
@@ -169,6 +201,22 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 				result := dummy.Mul(big.NewRat(-1, 1), op2.(*big.Rat))
 				stack.Push(result)
 			}
+		} else if isFunction(token) {
+			op2, err := stack.Pop()
+			if err != nil {
+				return nil, err
+			}
+			switch token {
+			case "sin":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Sin(float_result)))
+			case "cos":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Cos(float_result)))
+			case "tan":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Tan(float_result)))
+			}
 		} else {
 			return nil, fmt.Errorf("unknown token %v", token)
 		}
@@ -189,6 +237,10 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 func tokenise(expr string) []string {
 	spaced := unary_minus_rx.ReplaceAllString(expr, "$1 @")
 	spaced = fp_rx.ReplaceAllString(spaced, " ${1} ")
+	spaced = functions_rx.ReplaceAllString(spaced, " ${1} ")
+	if symbols_rx != nil {
+		spaced = symbols_rx.ReplaceAllString(spaced, " ${1} ")
+	}
 	symbols := []string{"(", ")"}
 	for _, symbol := range symbols {
 		spaced = strings.Replace(spaced, symbol, fmt.Sprintf(" %s ", symbol), -1)
@@ -214,6 +266,15 @@ func Eval(expr string) (result *big.Rat, err error) {
 	tokens := tokenise(expr)
 	postfix := convert2postfix(tokens)
 	return evaluatePostfix(postfix)
+}
+func EvalWithVariables(expr string, variables map[string]string) (result *big.Rat, err error) {
+	symbolTable = variables
+	s := ""
+	for k := range symbolTable {
+		s += k
+	}
+	symbols_rx = regexp.MustCompile(fmt.Sprintf("(%s)", s))
+	return Eval(expr)
 }
 
 // BigratToInt converts a *big.Rat to an int64 (with truncation); it
