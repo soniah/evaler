@@ -28,8 +28,8 @@ var symbols_rx *regexp.Regexp
 // Operator '@' means unary minus
 var operators = "-+**/<>@"
 
-var functions = "sincostan"
-var functions_rx = regexp.MustCompile(`(sin|cos|tan)`)
+var functions = "sincostanlnarcsinarccosarctan"
+var functions_rx = regexp.MustCompile(`(sin|cos|tan|ln|arcsin|arccos|arctan)`)
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -216,6 +216,18 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 			case "tan":
 				float_result := BigratToFloat(op2.(*big.Rat))
 				stack.Push(FloatToBigrat(math.Tan(float_result)))
+			case "arcsin":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Asin(float_result)))
+			case "arccos":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Acos(float_result)))
+			case "arctan":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Atan(float_result)))
+			case "ln":
+				float_result := BigratToFloat(op2.(*big.Rat))
+				stack.Push(FloatToBigrat(math.Log(float_result)))
 			}
 		} else {
 			return nil, fmt.Errorf("unknown token %v", token)

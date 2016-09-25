@@ -41,12 +41,16 @@ var testsEval = []struct {
 	{"sin(1)+2**2", big.NewRat(9682941969615793, 2000000000000000), true}, // sin in more complex expression
 	{"sin(2-1)", big.NewRat(1682941969615793, 2000000000000000), true},    // sin of expression
 	{"sin(2**2)", big.NewRat(-3784012476539641, 5000000000000000), true},  // sin of expression
-	{"1+sin(1)", big.NewRat(3682941969615793, 2000000000000000), true}, // THIS IS A BUG AND SHOULD NOT BREAK
-	{"cos(1)", big.NewRat(2701511529340699, 5000000000000000), true}, // simple sin
-	{"tan(1)", big.NewRat(778703862327451, 500000000000000), true},   // simple tan
-	{".5 * 2", big.NewRat(1, 1), true},                               // no leading zero
-	{"1. * 2", big.NewRat(2, 1), true},                               // no trailing numbers
-	{". * 2", nil, false},                                            // decimal, but no numbers at all
+	{"1+sin(1)", big.NewRat(3682941969615793, 2000000000000000), true},    // THIS IS A BUG AND SHOULD NOT BREAK
+	{"cos(1)", big.NewRat(2701511529340699, 5000000000000000), true},      // simple sin
+	{"tan(1)", big.NewRat(778703862327451, 500000000000000), true},        // simple tan
+	{"arcsin(1)", big.NewRat(7853981633974483, 5000000000000000), true},   // simple arcsin
+	{"arccos(1)", big.NewRat(0, 1), true},                                 // simple arcsin
+	{"arctan(1)", big.NewRat(7853981633974483, 10000000000000000), true},  // simple arcsin
+	{"ln(1)", big.NewRat(0, 1), true},                                     // simple ln
+	{".5 * 2", big.NewRat(1, 1), true},                                    // no leading zero
+	{"1. * 2", big.NewRat(2, 1), true},                                    // no trailing numbers
+	{". * 2", nil, false},                                                 // decimal, but no numbers at all
 }
 
 func TestEval(t *testing.T) {
@@ -84,6 +88,8 @@ var testsEvalSymbols = []struct {
 	//{"x", map[string]string{"t": "5"}, nil, false},                                                 // unassigned variable
 	{"sin(x)", map[string]string{"x": "1"}, big.NewRat(1682941969615793, 2000000000000000), true},       // negative of variable
 	{"sin(x)*(x+1)", map[string]string{"x": "1"}, big.NewRat(1682941969615793, 1000000000000000), true}, // negative of variable
+	{"sin(x)**-1", map[string]string{"x": "1"}, big.NewRat(2970987764473183, 2500000000000000), true},   // switcharoo
+	{"(x)*(x+1)", map[string]string{"x": "1"}, big.NewRat(2, 1), true},                                  // negative of variable
 }
 
 func TestEvalWithVariables(t *testing.T) {
