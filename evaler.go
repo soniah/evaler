@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/soniah/evaler/stack"
+	"github.com/bocajim/evaler/stack"
 )
 
 var whitespace_rx = regexp.MustCompile(`\s+`)
@@ -97,6 +97,8 @@ func convert2postfix(tokens []string) []string {
 			}
 
 		} else if isOperand(token) {
+			result = append(result, token)
+		} else {
 			result = append(result, token)
 		}
 
