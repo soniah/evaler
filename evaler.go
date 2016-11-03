@@ -20,11 +20,11 @@ var whitespace_rx = regexp.MustCompile(`\s+`)
 // Unary minus is appeared at the following positions.
 //     * the beginning of an expression
 //     * after an operator or '('
-var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>!=(])\s*)-`)
+var unary_minus_rx = regexp.MustCompile(`((?:^|[-+^%*/<>!=(])\s*)-`)
 var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
 
 // Operator '@' means unary minus
-var operators = "-+**/<>@!==>=<="
+var operators = "-+*/<>@^%!==>=<="
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -32,10 +32,12 @@ func prec(op string) (result int) {
 		result = 1
 	} else if op == "*" || op == "/" {
 		result = 2
-	} else if op == "**" {
+	} else if op == "^" || op == "%" {
 		result = 3
 	} else if op == "@" {
 		result = 4
+	} else {
+		result = 0
 	}
 	return
 }
@@ -136,10 +138,15 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 
 			dummy := new(big.Rat)
 			switch token {
-			case "**":
+			case "^":
 				float1 := BigratToFloat(op1.(*big.Rat))
 				float2 := BigratToFloat(op2.(*big.Rat))
 				float_result := math.Pow(float1, float2)
+				stack.Push(FloatToBigrat(float_result))
+			case "%":
+				float1 := BigratToFloat(op1.(*big.Rat))
+				float2 := BigratToFloat(op2.(*big.Rat))
+				float_result := math.Mod(float1, float2)
 				stack.Push(FloatToBigrat(float_result))
 			case "*":
 				result := dummy.Mul(op1.(*big.Rat), op2.(*big.Rat))

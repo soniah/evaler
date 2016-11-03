@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/soniah/evaler"
+	"github.com/bocajim/evaler"
 )
 
 // -----------------------------------------------------------------------------
@@ -33,13 +33,16 @@ var testsEval = []struct {
 	{"3+5 != 8", new(big.Rat), true},             // not-equals match
 	{"4+5 != 8", big.NewRat(1, 1), true},         // not-equals no-match
 	{"5 / 0", nil, false},                        // divide by zero
-	{"2 ** 3", big.NewRat(8, 1), true},           // exponent 1
-	{"9.0**0.5", big.NewRat(3, 1), true},         // exponent 2
+	{"2 ^ 3", big.NewRat(8, 1), true},            // exponent 1
+	{"9.0^0.5", big.NewRat(3, 1), true},          // exponent 2
+	{"10%3", big.NewRat(1, 1), true},             // mod 1
+	{"10%3 + 5", big.NewRat(6, 1), true},         // mod 2
+	{"5 + 10%3", big.NewRat(6, 1), true},         // mod 3
 	{"1.23", big.NewRat(123, 100), true},
-	{"-1+2", big.NewRat(1, 1), true},          // unary minus (the beginning of a expression)
-	{"3*-4", big.NewRat(-12, 1), true},        // unary minus (after an operator)
-	{"4/(-1+3)", big.NewRat(2, 1), true},      // unary minus (after '(' )
-	{"-(-1+2)--2**3", big.NewRat(7, 1), true}, // unary minus (complex)
+	{"-1+2", big.NewRat(1, 1), true},         // unary minus (the beginning of a expression)
+	{"3*-4", big.NewRat(-12, 1), true},       // unary minus (after an operator)
+	{"4/(-1+3)", big.NewRat(2, 1), true},     // unary minus (after '(' )
+	{"-(-1+2)--2^3", big.NewRat(7, 1), true}, // unary minus (complex)
 }
 
 func TestEval(t *testing.T) {
