@@ -1,10 +1,12 @@
 evaler
 ======
 
-[![Build Status](https://travis-ci.org/soniah/evaler.svg?branch=master)](https://travis-ci.org/soniah/evaler)
-[![Coverage](http://gocover.io/_badge/github.com/soniah/evaler)](http://gocover.io/github.com/soniah/evaler)
-[![GoDoc](https://godoc.org/github.com/soniah/evaler?status.png)](http://godoc.org/github.com/soniah/evaler)
-https://github.com/soniah/evaler
+[![Build Status](https://travis-ci.org/bocajim/evaler.svg?branch=master)](https://travis-ci.org/bocajim/evaler)
+[![Coverage](http://gocover.io/_badge/github.com/bocajim/evaler)](http://gocover.io/github.com/bocajim/evaler)
+[![GoDoc](https://godoc.org/github.com/bocajim/evaler?status.png)](http://godoc.org/github.com/bocajim/evaler)
+https://github.com/bocajim/evaler
+
+Project forked from https://github.com/soniah/evaler
 
 Package evaler implements a simple floating point arithmetic expression evaluator.
 
@@ -54,23 +56,19 @@ result is converted to a big.Rat and placed back on the stack.
 Documentation
 -------------
 
-http://godoc.org/github.com/soniah/evaler
+http://godoc.org/github.com/bocajim/evaler
 
 There are also a number of utility functions (eg BigratToFloat(),
 BigratToInt()) that may be useful when working with evaler.
 
-Author
+Original Author
 ------
-
 Sonia Hamilton
-
 http://blog.snowfrog.net
-
 sonia@snowfrog.net
 
 License
 -------
-
 Modified BSD License (BSD-3)
 
 Links
