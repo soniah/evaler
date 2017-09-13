@@ -57,6 +57,8 @@ var testsEval = []struct {
 	{"arctan(1)", big.NewRat(7853981633974483, 10000000000000000), true}, // simple arcsin
 	{"sqrt(9)", big.NewRat(3, 1), true},                                  // simple sqrt
 	{"ln(1)", big.NewRat(0, 1), true},                                    // simple ln
+	{"1 = 1", nil, false},                                                // check for invalid operator
+	{"1 == 1", big.NewRat(1, 1), true},                                   // check for valid operator
 	//	{".5 * 2", big.NewRat(1, 1), true},                                   // no leading zero
 	//	{"1. * 2", big.NewRat(2, 1), true},                                   // no trailing numbers
 	//	{". * 2", nil, false},                                                // decimal, but no numbers at all

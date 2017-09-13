@@ -26,7 +26,7 @@ var symbolTable map[string]string
 var symbols_rx *regexp.Regexp
 
 // Operator '@' means unary minus
-var operators = "-+*/<>@^%!==>=<="
+var operators = []string{"-", "+", "*", "/", "<", ">", "@", "^", "%", "!=", "==", ">=", "<="}
 
 var functions_rx = regexp.MustCompile(`(sin|cos|tan|ln|arcsin|arccos|arctan|sqrt)`)
 
@@ -59,7 +59,12 @@ func isFunction(token string) bool {
 
 // isOperator returns true if token is an operator
 func isOperator(token string) bool {
-	return strings.Contains(operators, token)
+	for _, v := range operators {
+		if v == token {
+			return true
+		}
+	}
+	return false
 }
 
 // isOperand returns true if token is an operand
