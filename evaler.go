@@ -70,6 +70,7 @@ func convert2postfix(tokens []string) []string {
 					if opGTE(top.(string), token) {
 						pop, _ := stack.Pop()
 						result = append(result, pop.(string))
+						continue
 					} else {
 						break OPERATOR
 					}

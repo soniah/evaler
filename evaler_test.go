@@ -36,6 +36,7 @@ var testsEval = []struct {
 	{"3*-4", big.NewRat(-12, 1), true},        // unary minus (after an operator)
 	{"4/(-1+3)", big.NewRat(2, 1), true},      // unary minus (after '(' )
 	{"-(-1+2)--2**3", big.NewRat(7, 1), true}, // unary minus (complex)
+	{"2*6**3+4**6", big.NewRat(4528, 1), true},
 }
 
 func TestEval(t *testing.T) {
