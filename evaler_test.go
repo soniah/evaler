@@ -114,7 +114,7 @@ func TestBigratToFloat(t *testing.T) {
 	for i, test := range testsBigratToFloat {
 		ret := evaler.BigratToFloat(test.in)
 		if ret != test.out {
-			t.Errorf("#%d: got %d expected %d", i, ret, test.out)
+			t.Errorf("#%d: got %f expected %f", i, ret, test.out)
 		}
 	}
 }
