@@ -60,9 +60,6 @@ sin(1)+2**2
 
 See `evaler_test.go` for more examples of using trigonometric operators.
 
-The trigonometric operators code was written by `dem-waffles
-<dem-waffles@server.fake>` and manually integrated by me - thank you.
-
 Issues
 ------
 
@@ -79,6 +76,21 @@ http://godoc.org/github.com/soniah/evaler
 There are also a number of utility functions e.g. `BigratToFloat()`,
 `BigratToInt()` that may be useful when working with evaler.
 
+Contributions
+-------------
+
+Contributions are welcome.
+
+If you've never contributed to a Go project before here is an example workflow.
+
+1. [fork this repo on the GitHub webpage](https://github.com/soniah/evaler/fork)
+1. `go get github.com/soniah/evaler`
+1. `cd $GOPATH/src/github.com/soniah/evaler`
+1. `git remote rename origin upstream`
+1. `git remote add origin git@github.com:<your-github-username>/evaler.git`
+1. `git checkout -b development`
+1. `git push -u origin development` (setup where you push to, check it works)
+
 Author
 ------
 
@@ -86,9 +98,7 @@ Sonia Hamilton sonia@snowfrog.net
 
 Dem Waffles dem-waffles@server.fake - trigonometric operators
 
-
 License
 -------
 
 Modified BSD License (BSD-3)
-
