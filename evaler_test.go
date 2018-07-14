@@ -31,11 +31,27 @@ var testsEval = []struct {
 	{"5 / 0", nil, false},                        // divide by zero
 	{"2 ** 3", big.NewRat(8, 1), true},           // exponent 1
 	{"9.0**0.5", big.NewRat(3, 1), true},         // exponent 2
+	{"4**-1", big.NewRat(1, 4), true},            // exponent 3
 	{"1.23", big.NewRat(123, 100), true},
-	{"-1+2", big.NewRat(1, 1), true},          // unary minus (the beginning of a expression)
-	{"3*-4", big.NewRat(-12, 1), true},        // unary minus (after an operator)
-	{"4/(-1+3)", big.NewRat(2, 1), true},      // unary minus (after '(' )
-	{"-(-1+2)--2**3", big.NewRat(7, 1), true}, // unary minus (complex)
+	{"-1+2", big.NewRat(1, 1), true},                                      // unary minus (the beginning of a expression)
+	{"3*-4", big.NewRat(-12, 1), true},                                    // unary minus (after an operator)
+	{"4/(-1+3)", big.NewRat(2, 1), true},                                  // unary minus (after '(' )
+	{"-(-1+2)--2**3", big.NewRat(7, 1), true},                             // unary minus (complex)
+	{"sin(1)", big.NewRat(1682941969615793, 2000000000000000), true},      // simple sin
+	{"sin(1)+1", big.NewRat(3682941969615793, 2000000000000000), true},    // sin in an expression
+	{"sin(1)+2**2", big.NewRat(9682941969615793, 2000000000000000), true}, // sin in more complex expression
+	{"sin(2-1)", big.NewRat(1682941969615793, 2000000000000000), true},    // sin of expression
+	{"sin(2**2)", big.NewRat(-3784012476539641, 5000000000000000), true},  // sin of expression
+	{"1+sin(1)", big.NewRat(3682941969615793, 2000000000000000), true},    // THIS IS A BUG AND SHOULD NOT BREAK
+	{"cos(1)", big.NewRat(2701511529340699, 5000000000000000), true},      // simple sin
+	{"tan(1)", big.NewRat(778703862327451, 500000000000000), true},        // simple tan
+	{"arcsin(1)", big.NewRat(7853981633974483, 5000000000000000), true},   // simple arcsin
+	{"arccos(1)", big.NewRat(0, 1), true},                                 // simple arcsin
+	{"arctan(1)", big.NewRat(7853981633974483, 10000000000000000), true},  // simple arcsin
+	{"ln(1)", big.NewRat(0, 1), true},                                     // simple ln
+	{".5 * 2", big.NewRat(1, 1), true},                                    // no leading zero
+	{"1. * 2", big.NewRat(2, 1), true},                                    // no trailing numbers
+	{". * 2", nil, false},                                                 // decimal, but no numbers at all
 }
 
 func TestEval(t *testing.T) {
