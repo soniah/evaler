@@ -1,13 +1,11 @@
 language: go
 
 go:
-- 1.1
-- 1.2
-- 1.3
-- 1.4
+- 1.6.2
+- 1.7.1
 
 install:
-- go get github.com/soniah/evaler
+- go get github.com/bocajim/evaler
 
 script:
 - go test
