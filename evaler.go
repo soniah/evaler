@@ -21,7 +21,7 @@ var whitespace_rx = regexp.MustCompile(`\s+`)
 //     * the beginning of an expression
 //     * after an operator or '('
 var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
-var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
+var fp_rx = regexp.MustCompile(`(\d*\.?\d+)`) // simple fp number
 
 // Operator '@' means unary minus
 var operators = "-+**/<>@"
