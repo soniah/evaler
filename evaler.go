@@ -322,7 +322,7 @@ func tokenise(expr string) []string {
 
 	stripped := whitespace_rx.ReplaceAllString(strings.TrimSpace(spaced), "|")
 	result := strings.Split(stripped, "|")
-	fmt.Fprintf(os.Stderr, "expr: %#v \t\tresult: %#v\n", expr, result)
+	fmt.Fprintf(os.Stderr, "%#v\n%#v,\n\n", expr, result)
 
 	return result
 }
