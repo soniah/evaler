@@ -38,172 +38,173 @@ var testsEval = []struct {
 		true}, // simple divide
 
 	{"U + U",
-		[]string{},
+		[]string{"U", "+", "U"},
 		nil,
 		false}, // letters 1
 
 	{"2 + U",
-		[]string{},
+		[]string{"2", "+", "U"},
+
 		nil,
 		false}, // broken 1
 
 	{"2 +  ",
-		[]string{},
+		[]string{"2", "+"},
 		nil,
 		false}, // broken 2
 
 	{"+ 2 - + * ",
-		[]string{},
+		[]string{"+", "2", "-", "+", "*"},
 		nil,
 		false}, // broken 3
 
 	{"5.5+2*(3+1)",
-		[]string{},
+		[]string{"5.5", "+", "2", "*", "(", "3", "+", "1", ")"},
 		big.NewRat(27, 2),
 		true}, // complex 1
 
 	{"(((1+2.3)))",
-		[]string{},
+		[]string{"(", "(", "(", "1", "+", "2.3", ")", ")", ")"},
 		big.NewRat(33, 10),
 		true}, // complex 2
 
 	{"(1+(2))*(5-2.5)",
-		[]string{},
+		[]string{"(", "1", "+", "(", "2", ")", ")", "*", "(", "5", "-", "2.5", ")"},
 		big.NewRat(15, 2),
 		true}, // complex 3
 
 	{"3*(2<4)",
-		[]string{},
+		[]string{"3", "*", "(", "2", "<", "4", ")"},
 		big.NewRat(3, 1),
 		true}, // less than
 
 	{"3*(2>4)",
-		[]string{},
+		[]string{"3", "*", "(", "2", ">", "4", ")"},
 		new(big.Rat),
 		true}, // greater than
 
 	{"3+5 == 8",
-		[]string{},
+		[]string{"3", "+", "5", "==", "8"},
 		big.NewRat(1, 1),
 		true}, // equals match
 
 	{"4+5 == 8",
-		[]string{},
+		[]string{"4", "+", "5", "==", "8"},
 		new(big.Rat),
 		true}, // equals no-match
 
 	{"3+5 != 8",
-		[]string{},
+		[]string{"3", "+", "5", "!=", "8"},
 		new(big.Rat),
 		true}, // not-equals match
 
 	{"4+5 != 8",
-		[]string{},
+		[]string{"4", "+", "5", "!=", "8"},
 		big.NewRat(1, 1),
 		true}, // not-equals no-match
 
 	{"5 / 0",
-		[]string{},
+		[]string{"5", "/", "0"},
 		nil,
 		false}, // divide by zero
 
 	{"2 ^ 3",
-		[]string{},
+		[]string{"2", "^", "3"},
 		big.NewRat(8, 1),
 		true}, // exponent 1
 
 	{"2 ** 3",
-		[]string{},
+		[]string{"2", "**", "3"},
 		big.NewRat(8, 1),
 		true}, // exponent 1
 
 	{"9.0^0.5",
-		[]string{},
+		[]string{"9.0", "^", "0.5"},
 		big.NewRat(3, 1),
 		true}, // exponent 2
 
 	{"4^-1",
-		[]string{},
+		[]string{"4", "^-", "1"},
 		big.NewRat(1, 4),
 		true}, // exponent 3
 
 	{"10%3",
-		[]string{},
+		[]string{"10", "%", "3"},
 		big.NewRat(1, 1),
 		true}, // mod 1
 
 	{"10%3 + 5",
-		[]string{},
+		[]string{"10", "%", "3", "+", "5"},
 		big.NewRat(6, 1),
 		true}, // mod 2
 
 	{"5 + 10%3",
-		[]string{},
+		[]string{"5", "+", "10", "%", "3"},
 		big.NewRat(6, 1),
 		true}, // mod 3
 
 	{"9.0**0.5",
-		[]string{},
+		[]string{"9.0", "**", "0.5"},
 		big.NewRat(3, 1),
 		true}, // exponent 2
 
 	{"4**-1",
-		[]string{},
+		[]string{"4", "**", "@", "1"},
 		big.NewRat(1, 4),
 		true}, // exponent 3
 
 	{"1.23",
-		[]string{},
+		[]string{"1.23"},
 		big.NewRat(123, 100),
 		true},
 
 	{"-1+2",
-		[]string{},
+		[]string{"@", "1", "+", "2"},
 		big.NewRat(1, 1),
 		true}, // unary minus (the beginning of a expression)
 
 	{"3*-4",
-		[]string{},
+		[]string{"3", "*", "@", "4"},
 		big.NewRat(-12, 1),
 		true}, // unary minus (after an operator)
 
 	{"4/(-1+3)",
-		[]string{},
+		[]string{"4", "/", "(", "@", "1", "+", "3", ")"},
 		big.NewRat(2, 1),
 		true}, // unary minus (after '(' )
 
 	{"-(-1+2)--2**3",
-		[]string{},
+		[]string{"@", "(", "@", "1", "+", "2", ")", "-", "@", "2", "**", "3"},
 		big.NewRat(7, 1),
 		true}, // unary minus (complex)
 
 	{"-(-1+2)--2^3",
-		[]string{},
+		[]string{"@", "(", "@", "1", "+", "2", ")", "-", "@", "2", "^", "3"},
 		big.NewRat(7, 1),
 		true}, // unary minus (complex)
 
 	{"sin(1)",
-		[]string{},
+		[]string{"sin", "(", "1", ")"},
 		big.NewRat(1682941969615793, 2000000000000000),
 		true}, // simple sin
 
 	{"sin(1)+1",
-		[]string{},
+		[]string{"sin", "(", "1", ")", "+", "1"},
 		big.NewRat(3682941969615793, 2000000000000000),
 		true}, // sin in an expression
 
 	{"sin(1)+2^2",
-		[]string{},
+		[]string{"sin", "(", "1", ")", "+", "2", "^", "2"},
 		big.NewRat(9682941969615793, 2000000000000000),
 		true}, // sin in more complex expression
 
 	{"sin(1)+2**2",
-		[]string{},
+		[]string{"sin", "(", "1", ")", "+", "2", "**", "2"},
 		big.NewRat(9682941969615793, 2000000000000000),
 		true}, // sin in more complex expression
 
 	{"sin(2-1)",
-		[]string{},
+		[]string{"sin", "(", "2", "-", "1", ")"},
 		big.NewRat(1682941969615793, 2000000000000000),
 		true}, // sin of expression
 
