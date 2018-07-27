@@ -342,7 +342,6 @@ var testsEvalSymbols = []struct {
 	{"(x)*(x+1)", map[string]string{"x": "1"}, big.NewRat(2, 1), true},                                  // negative of variable
 }
 
-// TODO failing BIG
 func TestEvalWithVariables(t *testing.T) {
 	for i, test := range testsEvalSymbols {
 		ret, err := evaler.EvalWithVariables(test.in, test.variables)
