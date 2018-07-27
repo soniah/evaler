@@ -17,7 +17,6 @@ import (
 
 
 // all regex's here
-var fp_rx = regexp.MustCompile(`(\d*\.?\d+)`) // simple fp number
 var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
 
 var functions_rx = regexp.MustCompile(`(sin|cos|tan|ln|arcsin|arccos|arctan|sqrt)`)
