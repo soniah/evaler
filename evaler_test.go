@@ -1,13 +1,13 @@
 package evaler_test
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"testing"
 
 	"github.com/soniah/evaler"
 	"github.com/stretchr/testify/assert"
-	"fmt"
 )
 
 // -----------------------------------------------------------------------------
@@ -275,10 +275,10 @@ var testsEval = []struct {
 		true}, // check for valid operator
 
 	/* TODO this is breaking, probably because of regex for floating point number
-{".5 * 2",
-	[]string{".", "5", "*", "2"},
-	big.NewRat(1, 1),
-	true}, // no leading zero
+	{".5 * 2",
+		[]string{".", "5", "*", "2"},
+		big.NewRat(1, 1),
+		true}, // no leading zero
 	*/
 
 	{"1. * 2",
