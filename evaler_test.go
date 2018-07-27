@@ -38,19 +38,23 @@ var testsEval = []struct {
 
 	{"U + U",
 		[]string{},
-		nil, false}, // letters 1
+		nil,
+		false}, // letters 1
 
 	{"2 + U",
 		[]string{},
-		nil, false}, // broken 1
+		nil,
+		false}, // broken 1
 
 	{"2 +  ",
 		[]string{},
-		nil, false}, // broken 2
+		nil,
+		false}, // broken 2
 
 	{"+ 2 - + * ",
 		[]string{},
-		nil, false}, // broken 3
+		nil,
+		false}, // broken 3
 
 	{"5.5+2*(3+1)",
 		[]string{},
@@ -99,7 +103,8 @@ var testsEval = []struct {
 
 	{"5 / 0",
 		[]string{},
-		nil, false}, // divide by zero
+		nil,
+		false}, // divide by zero
 
 	{"2 ^ 3",
 		[]string{},
@@ -253,7 +258,8 @@ var testsEval = []struct {
 
 	{"1 = 1",
 		[]string{},
-		nil, false}, // check for invalid operator
+		nil,
+		false}, // check for invalid operator
 
 	{"1 == 1",
 		[]string{},
@@ -272,7 +278,8 @@ var testsEval = []struct {
 
 	{". * 2",
 		[]string{},
-		nil, false}, // decimal, but no numbers at all
+		nil,
+		false}, // decimal, but no numbers at all
 
 	{"2*6**3+4**6",
 		[]string{},
