@@ -209,82 +209,82 @@ var testsEval = []struct {
 		true}, // sin of expression
 
 	{"sin(2^2)",
-		[]string{},
+		[]string{"sin", "(", "2", "^", "2", ")"},
 		big.NewRat(-3784012476539641, 5000000000000000),
 		true}, // sin of expression
 
 	{"sin(2**2)",
-		[]string{},
+		[]string{"sin", "(", "2", "**", "2", ")"},
 		big.NewRat(-3784012476539641, 5000000000000000),
 		true}, // sin of expression
 
 	{"1+sin(1)",
-		[]string{},
+		[]string{"1", "+", "sin", "(", "1", ")"},
 		big.NewRat(3682941969615793, 2000000000000000),
 		true}, // THIS IS A BUG AND SHOULD NOT BREAK
 
 	{"cos(1)",
-		[]string{},
+		[]string{"cos", "(", "1", ")"},
 		big.NewRat(2701511529340699, 5000000000000000),
 		true}, // simple sin
 
 	{"tan(1)",
-		[]string{},
+		[]string{"tan", "(", "1", ")"},
 		big.NewRat(778703862327451, 500000000000000),
 		true}, // simple tan
 
 	{"arcsin(1)",
-		[]string{},
+		[]string{"arcsin", "(", "1", ")"},
 		big.NewRat(7853981633974483, 5000000000000000),
 		true}, // simple arcsin
 
 	{"arccos(1)",
-		[]string{},
+		[]string{"arccos", "(", "1", ")"},
 		big.NewRat(0, 1),
 		true}, // simple arcsin
 
 	{"arctan(1)",
-		[]string{},
+		[]string{"arctan", "(", "1", ")"},
 		big.NewRat(7853981633974483, 10000000000000000),
 		true}, // simple arcsin
 
 	{"sqrt(9)",
-		[]string{},
+		[]string{"sqrt", "(", "9", ")"},
 		big.NewRat(3, 1),
 		true}, // simple sqrt
 
 	{"ln(1)",
-		[]string{},
+		[]string{"ln", "(", "1", ")"},
 		big.NewRat(0, 1),
 		true}, // simple ln
 
 	{"1 = 1",
-		[]string{},
+		[]string{"1", "=", "1"},
 		nil,
 		false}, // check for invalid operator
 
 	{"1 == 1",
-		[]string{},
+		[]string{"1", "==", "1"},
 		big.NewRat(1, 1),
 		true}, // check for valid operator
 
 	{".5 * 2",
-		[]string{},
+		[]string{".", "5", "*", "2"},
 		big.NewRat(1, 1),
 		true}, // no leading zero
 
 	{"1. * 2",
-		[]string{},
+		[]string{"1", ".", "*", "2"},
 		big.NewRat(2, 1),
 		true}, // no trailing numbers
 
 	{". * 2",
-		[]string{},
+		[]string{".", "*", "2"},
 		nil,
 		false}, // decimal, but no numbers at all
 
 	{"2*6**3+4**6",
-		[]string{},
+		[]string{"2", "*", "6", "**", "3", "+", "4", "**", "6"},
 		big.NewRat(4528, 1),
 		true},
 }
