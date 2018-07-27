@@ -15,26 +15,27 @@ import (
 	"github.com/soniah/evaler/stack"
 )
 
+
+// all regex's here
+var fp_rx = regexp.MustCompile(`(\d*\.?\d+)`) // simple fp number
+var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
+
+var functions_rx = regexp.MustCompile(`(sin|cos|tan|ln|arcsin|arccos|arctan|sqrt)`)
+var symbols_rx *regexp.Regexp
+var symbols_rx = regexp.MustCompile(fmt.Sprintf("(%s)", s))
+
+var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
+var unary_minus_rx = regexp.MustCompile(`((?:^|[-+^%*/<>!=(])\s*)-`)
+
 var whitespace_rx = regexp.MustCompile(`\s+`)
 
-// Unary minus is appeared at the following positions.
-//     * the beginning of an expression
-//     * after an operator or '('
-var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
-var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
-// vs
-//var unary_minus_rx = regexp.MustCompile(`((?:^|[-+^%*/<>!=(])\s*)-`)
-//var fp_rx = regexp.MustCompile(`(\d*\.?\d+)`) // simple fp number
 
-// new
 var symbolTable map[string]string
-var symbols_rx *regexp.Regexp
 
 // Operator '@' means unary minus
 
 var operators = []string{"-", "+", "*", "/", "<", ">", "@", "^", "%", "!=", "==", ">=", "<="}
 
-var functions_rx = regexp.MustCompile(`(sin|cos|tan|ln|arcsin|arccos|arctan|sqrt)`)
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -350,7 +351,6 @@ func EvalWithVariables(expr string, variables map[string]string) (result *big.Ra
 	for k := range symbolTable {
 		s += k
 	}
-	symbols_rx = regexp.MustCompile(fmt.Sprintf("(%s)", s))
 	return Eval(expr)
 }
 
