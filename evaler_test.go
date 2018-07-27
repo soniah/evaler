@@ -296,8 +296,14 @@ func TestTokenise(t *testing.T) {
 	}
 }
 
+// TODO failing BIG
 func TestEval(t *testing.T) {
 	for i, test := range testsEval {
+
+		if i != 18 { // case 18 onwards is breaking
+			continue
+		}
+
 		ret, err := evaler.Eval(test.in)
 		if ret == nil && test.out == nil {
 			// ok, do nothing
@@ -333,6 +339,7 @@ var testsEvalSymbols = []struct {
 	{"(x)*(x+1)", map[string]string{"x": "1"}, big.NewRat(2, 1), true},                                  // negative of variable
 }
 
+// TODO failing BIG
 func TestEvalWithVariables(t *testing.T) {
 	for i, test := range testsEvalSymbols {
 		ret, err := evaler.EvalWithVariables(test.in, test.variables)

@@ -15,9 +15,21 @@
 
 package stack
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type Stack []interface{}
+
+// Stringer is useful for debugging
+func (s Stack) String() string {
+	var result string
+	for _, value := range s {
+		result += fmt.Sprintf("%s | ", value)
+	}
+	return result
+}
 
 func (stack *Stack) Pop() (interface{}, error) {
 	theStack := *stack

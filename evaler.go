@@ -89,6 +89,8 @@ func convert2postfix(tokens []string) []string {
 	var stack stack.Stack
 	var result []string
 	for _, token := range tokens {
+		stackString := fmt.Sprint(stack) // HACK - for debugging
+		stackString += ""                // HACK - debugging
 
 		if isOperator(token) {
 
@@ -107,6 +109,7 @@ func convert2postfix(tokens []string) []string {
 				break OPERATOR
 			}
 			stack.Push(token)
+
 		} else if isFunction(token) {
 		FUNCTION:
 			for {
@@ -122,6 +125,7 @@ func convert2postfix(tokens []string) []string {
 				break FUNCTION
 			}
 			stack.Push(token)
+
 		} else if token == "(" {
 			stack.Push(token)
 
@@ -140,8 +144,10 @@ func convert2postfix(tokens []string) []string {
 
 		} else if isOperand(token) {
 			result = append(result, token)
+
 		} else if isSymbol(token) {
 			result = append(result, symbolTable[token])
+
 		} else {
 			result = append(result, token)
 		}
