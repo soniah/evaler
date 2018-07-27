@@ -276,8 +276,8 @@ var testsEval = []struct {
 
 	{"1. * 2",
 		[]string{"1", ".", "*", "2"},
-		big.NewRat(2, 1),
-		true}, // no trailing numbers
+		nil,
+		false}, // no trailing numbers
 
 	{". * 2",
 		[]string{".", "*", "2"},
@@ -301,7 +301,7 @@ func TestEval(t *testing.T) {
 	for i, test := range testsEval {
 
 		/*
-		if i != 31 {
+		if i != 50 {
 			continue
 		}
 		*/
