@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/soniah/evaler/stack"
+	"os"
 )
 
 var whitespace_rx = regexp.MustCompile(`\s+`)
@@ -305,18 +306,25 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 // trailing spaces, then splits on spaces
 //
 func tokenise(expr string) []string {
+
 	spaced := unary_minus_rx.ReplaceAllString(expr, "$1 @")
 	spaced = fp_rx.ReplaceAllString(spaced, " ${1} ")
 	spaced = functions_rx.ReplaceAllString(spaced, " ${1} ")
+
 	if symbols_rx != nil {
 		spaced = symbols_rx.ReplaceAllString(spaced, " ${1} ")
 	}
+
 	symbols := []string{"(", ")"}
 	for _, symbol := range symbols {
 		spaced = strings.Replace(spaced, symbol, fmt.Sprintf(" %s ", symbol), -1)
 	}
+
 	stripped := whitespace_rx.ReplaceAllString(strings.TrimSpace(spaced), "|")
-	return strings.Split(stripped, "|")
+	result := strings.Split(stripped, "|")
+	fmt.Fprintf(os.Stderr, "expr: %#v \t\tresult: %#v\n", expr, result)
+
+	return result
 }
 
 // Eval takes an infix string arithmetic expression, and evaluates it
