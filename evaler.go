@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/soniah/evaler/stack"
-	"os"
 )
 
 var whitespace_rx = regexp.MustCompile(`\s+`)
@@ -32,7 +31,6 @@ var symbolTable map[string]string
 var symbols_rx *regexp.Regexp
 
 // Operator '@' means unary minus
-// WAS var operators = "-+**/<>@"
 
 var operators = []string{"-", "+", "*", "/", "<", ">", "@", "^", "%", "!=", "==", ">=", "<="}
 
@@ -322,7 +320,7 @@ func Tokenise(expr string) []string {
 
 	stripped := whitespace_rx.ReplaceAllString(strings.TrimSpace(spaced), "|")
 	result := strings.Split(stripped, "|")
-	fmt.Fprintf(os.Stderr, "%#v\n%#v,\n\n", expr, result)
+	//fmt.Fprintf(os.Stderr, "%#v\n%#v,\n\n", expr, result)
 
 	return result
 }

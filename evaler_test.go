@@ -7,6 +7,7 @@ import (
 
 	"github.com/soniah/evaler"
 	"github.com/stretchr/testify/assert"
+	"fmt"
 )
 
 // -----------------------------------------------------------------------------
@@ -124,7 +125,7 @@ var testsEval = []struct {
 		true}, // exponent 2
 
 	{"4^-1",
-		[]string{"4", "^-", "1"},
+		[]string{"4", "^", "@", "1"},
 		big.NewRat(1, 4),
 		true}, // exponent 3
 
@@ -290,8 +291,8 @@ var testsEval = []struct {
 }
 
 func TestTokenise(t *testing.T) {
-	for _, test := range testsEval {
-		assert.EqualValues(t, test.tokens, evaler.Tokenise(test.in), "tokenise failed")
+	for i, test := range testsEval {
+		assert.EqualValues(t, test.tokens, evaler.Tokenise(test.in), fmt.Sprintf("#%d failed: %s", i, test.in))
 	}
 }
 
