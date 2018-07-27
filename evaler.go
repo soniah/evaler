@@ -18,14 +18,10 @@ import (
 
 // all regex's here
 var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
-
 var functions_rx = regexp.MustCompile(`(sin|cos|tan|ln|arcsin|arccos|arctan|sqrt)`)
-
 var symbols_rx *regexp.Regexp // TODO used as a global variable!!
-
 var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
 var unary_minus_rx = regexp.MustCompile(`((?:^|[-+^%*/<>!=(])\s*)-`)
-
 var whitespace_rx = regexp.MustCompile(`\s+`)
 
 
