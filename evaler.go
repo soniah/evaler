@@ -15,21 +15,17 @@ import (
 	"github.com/soniah/evaler/stack"
 )
 
-
 // all regex's here
 var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
 var functions_rx = regexp.MustCompile(`(sin|cos|tan|ln|arcsin|arccos|arctan|sqrt)`)
-var symbols_rx *regexp.Regexp // TODO used as a global variable!!
+var symbols_rx *regexp.Regexp // TODO used as a mutable global variable!!
 var unary_minus_rx = regexp.MustCompile(`((?:^|[-+^%*/<>!=(])\s*)-`)
 var whitespace_rx = regexp.MustCompile(`\s+`)
 
+var symbolTable map[string]string // TODO used as a mutable global variable!!
 
-var symbolTable map[string]string
-
-// Operator '@' means unary minus
-
+// Operator '@' means unary minus TODO ** is also a valid operator
 var operators = []string{"-", "+", "*", "/", "<", ">", "@", "^", "%", "!=", "==", ">=", "<="}
-
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -41,7 +37,7 @@ func prec(op string) (result int) {
 		result = 3
 	} else if op == "@" {
 		result = 4
-	// WAS } else if functions_rx.MatchString(op) {
+		// WAS } else if functions_rx.MatchString(op) {
 	} else if functions_rx.MatchString(op) {
 		result = 5
 	} else {
