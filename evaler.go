@@ -300,12 +300,12 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 	return retval.(*big.Rat), nil
 }
 
-// tokenise takes an expr string and converts it to a slice of tokens
+// Tokenise takes an expr string and converts it to a slice of tokens
 //
-// tokenise puts spaces around all non-numbers, removes leading and
+// Tokenise puts spaces around all non-numbers, removes leading and
 // trailing spaces, then splits on spaces
 //
-func tokenise(expr string) []string {
+func Tokenise(expr string) []string {
 
 	spaced := unary_minus_rx.ReplaceAllString(expr, "$1 @")
 	spaced = fp_rx.ReplaceAllString(spaced, " ${1} ")
@@ -341,7 +341,7 @@ func Eval(expr string) (result *big.Rat, err error) {
 		}
 	}()
 
-	tokens := tokenise(expr)
+	tokens := Tokenise(expr)
 	postfix := convert2postfix(tokens)
 	return evaluatePostfix(postfix)
 }

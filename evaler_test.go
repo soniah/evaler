@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/soniah/evaler"
+	"github.com/stretchr/testify/assert"
 )
 
 // -----------------------------------------------------------------------------
@@ -285,6 +286,12 @@ var testsEval = []struct {
 		[]string{},
 		big.NewRat(4528, 1),
 		true},
+}
+
+func TestTokenise(t *testing.T) {
+	for _, test := range testsEval {
+		assert.EqualValues(t, test.tokens, evaler.Tokenise(test.in), "tokenise failed")
+	}
 }
 
 func TestEval(t *testing.T) {
