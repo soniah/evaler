@@ -21,8 +21,7 @@ var fp_rx = regexp.MustCompile(`(\d+(?:\.\d+)?)`) // simple fp number
 
 var functions_rx = regexp.MustCompile(`(sin|cos|tan|ln|arcsin|arccos|arctan|sqrt)`)
 
-var symbols_rx *regexp.Regexp
-var symbols_rx = regexp.MustCompile(fmt.Sprintf("(%s)", s))
+var symbols_rx *regexp.Regexp // TODO used as a global variable!!
 
 var unary_minus_rx = regexp.MustCompile(`((?:^|[-+*/<>(])\s*)-`)
 var unary_minus_rx = regexp.MustCompile(`((?:^|[-+^%*/<>!=(])\s*)-`)
@@ -351,6 +350,7 @@ func EvalWithVariables(expr string, variables map[string]string) (result *big.Ra
 	for k := range symbolTable {
 		s += k
 	}
+	symbols_rx = regexp.MustCompile(fmt.Sprintf("(%s)", s))
 	return Eval(expr)
 }
 
