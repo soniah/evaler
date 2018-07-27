@@ -102,3 +102,15 @@ License
 -------
 
 Modified BSD License (BSD-3)
+
+Links
+-----
+
+[1] http://en.wikipedia.org/wiki/Shunting-yard_algorithm
+
+[2] http://en.wikipedia.org/wiki/Reverse_Polish_notation
+
+[3] http://willcode4beer.com/design.jsp?set=evalInfix
+
+[4] http://www.mathsisfun.com/operation-order-bodmas.html
+
