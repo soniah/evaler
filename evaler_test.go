@@ -28,11 +28,13 @@ var testsEval = []struct {
 
 	{"5 * 2",
 		[]string{},
-		big.NewRat(10, 1), true}, // simple multiply
+		big.NewRat(10, 1),
+		true}, // simple multiply
 
 	{"5 / 2",
 		[]string{},
-		big.NewRat(5, 2), true}, // simple divide
+		big.NewRat(5, 2),
+		true}, // simple divide
 
 	{"U + U",
 		[]string{},
@@ -52,39 +54,48 @@ var testsEval = []struct {
 
 	{"5.5+2*(3+1)",
 		[]string{},
-		big.NewRat(27, 2), true}, // complex 1
+		big.NewRat(27, 2),
+		true}, // complex 1
 
 	{"(((1+2.3)))",
 		[]string{},
-		big.NewRat(33, 10), true}, // complex 2
+		big.NewRat(33, 10),
+		true}, // complex 2
 
 	{"(1+(2))*(5-2.5)",
 		[]string{},
-		big.NewRat(15, 2), true}, // complex 3
+		big.NewRat(15, 2),
+		true}, // complex 3
 
 	{"3*(2<4)",
 		[]string{},
-		big.NewRat(3, 1), true}, // less than
+		big.NewRat(3, 1),
+		true}, // less than
 
 	{"3*(2>4)",
 		[]string{},
-		new(big.Rat), true}, // greater than
+		new(big.Rat),
+		true}, // greater than
 
 	{"3+5 == 8",
 		[]string{},
-		big.NewRat(1, 1), true}, // equals match
+		big.NewRat(1, 1),
+		true}, // equals match
 
 	{"4+5 == 8",
 		[]string{},
-		new(big.Rat), true}, // equals no-match
+		new(big.Rat),
+		true}, // equals no-match
 
 	{"3+5 != 8",
 		[]string{},
-		new(big.Rat), true}, // not-equals match
+		new(big.Rat),
+		true}, // not-equals match
 
 	{"4+5 != 8",
 		[]string{},
-		big.NewRat(1, 1), true}, // not-equals no-match
+		big.NewRat(1, 1),
+		true}, // not-equals no-match
 
 	{"5 / 0",
 		[]string{},
@@ -92,123 +103,153 @@ var testsEval = []struct {
 
 	{"2 ^ 3",
 		[]string{},
-		big.NewRat(8, 1), true}, // exponent 1
+		big.NewRat(8, 1),
+		true}, // exponent 1
 
 	{"2 ** 3",
 		[]string{},
-		big.NewRat(8, 1), true}, // exponent 1
+		big.NewRat(8, 1),
+		true}, // exponent 1
 
 	{"9.0^0.5",
 		[]string{},
-		big.NewRat(3, 1), true}, // exponent 2
+		big.NewRat(3, 1),
+		true}, // exponent 2
 
 	{"4^-1",
 		[]string{},
-		big.NewRat(1, 4), true}, // exponent 3
+		big.NewRat(1, 4),
+		true}, // exponent 3
 
 	{"10%3",
 		[]string{},
-		big.NewRat(1, 1), true}, // mod 1
+		big.NewRat(1, 1),
+		true}, // mod 1
 
 	{"10%3 + 5",
 		[]string{},
-		big.NewRat(6, 1), true}, // mod 2
+		big.NewRat(6, 1),
+		true}, // mod 2
 
 	{"5 + 10%3",
 		[]string{},
-		big.NewRat(6, 1), true}, // mod 3
+		big.NewRat(6, 1),
+		true}, // mod 3
 
 	{"9.0**0.5",
 		[]string{},
-		big.NewRat(3, 1), true}, // exponent 2
+		big.NewRat(3, 1),
+		true}, // exponent 2
 
 	{"4**-1",
 		[]string{},
-		big.NewRat(1, 4), true}, // exponent 3
+		big.NewRat(1, 4),
+		true}, // exponent 3
 
 	{"1.23",
 		[]string{},
-		big.NewRat(123, 100), true},
+		big.NewRat(123, 100),
+		true},
 
 	{"-1+2",
 		[]string{},
-		big.NewRat(1, 1), true}, // unary minus (the beginning of a expression)
+		big.NewRat(1, 1),
+		true}, // unary minus (the beginning of a expression)
 
 	{"3*-4",
 		[]string{},
-		big.NewRat(-12, 1), true}, // unary minus (after an operator)
+		big.NewRat(-12, 1),
+		true}, // unary minus (after an operator)
 
 	{"4/(-1+3)",
 		[]string{},
-		big.NewRat(2, 1), true}, // unary minus (after '(' )
+		big.NewRat(2, 1),
+		true}, // unary minus (after '(' )
 
 	{"-(-1+2)--2**3",
 		[]string{},
-		big.NewRat(7, 1), true}, // unary minus (complex)
+		big.NewRat(7, 1),
+		true}, // unary minus (complex)
 
 	{"-(-1+2)--2^3",
 		[]string{},
-		big.NewRat(7, 1), true}, // unary minus (complex)
+		big.NewRat(7, 1),
+		true}, // unary minus (complex)
 
 	{"sin(1)",
 		[]string{},
-		big.NewRat(1682941969615793, 2000000000000000), true}, // simple sin
+		big.NewRat(1682941969615793, 2000000000000000),
+		true}, // simple sin
 
 	{"sin(1)+1",
 		[]string{},
-		big.NewRat(3682941969615793, 2000000000000000), true}, // sin in an expression
+		big.NewRat(3682941969615793, 2000000000000000),
+		true}, // sin in an expression
 
 	{"sin(1)+2^2",
 		[]string{},
-		big.NewRat(9682941969615793, 2000000000000000), true}, // sin in more complex expression
+		big.NewRat(9682941969615793, 2000000000000000),
+		true}, // sin in more complex expression
 
 	{"sin(1)+2**2",
 		[]string{},
-		big.NewRat(9682941969615793, 2000000000000000), true}, // sin in more complex expression
+		big.NewRat(9682941969615793, 2000000000000000),
+		true}, // sin in more complex expression
 
 	{"sin(2-1)",
 		[]string{},
-		big.NewRat(1682941969615793, 2000000000000000), true}, // sin of expression
+		big.NewRat(1682941969615793, 2000000000000000),
+		true}, // sin of expression
 
 	{"sin(2^2)",
 		[]string{},
-		big.NewRat(-3784012476539641, 5000000000000000), true}, // sin of expression
+		big.NewRat(-3784012476539641, 5000000000000000),
+		true}, // sin of expression
 
 	{"sin(2**2)",
 		[]string{},
-		big.NewRat(-3784012476539641, 5000000000000000), true}, // sin of expression
+		big.NewRat(-3784012476539641, 5000000000000000),
+		true}, // sin of expression
 
 	{"1+sin(1)",
 		[]string{},
-		big.NewRat(3682941969615793, 2000000000000000), true}, // THIS IS A BUG AND SHOULD NOT BREAK
+		big.NewRat(3682941969615793, 2000000000000000),
+		true}, // THIS IS A BUG AND SHOULD NOT BREAK
 
 	{"cos(1)",
 		[]string{},
-		big.NewRat(2701511529340699, 5000000000000000), true}, // simple sin
+		big.NewRat(2701511529340699, 5000000000000000),
+		true}, // simple sin
 
 	{"tan(1)",
 		[]string{},
-		big.NewRat(778703862327451, 500000000000000), true}, // simple tan
+		big.NewRat(778703862327451, 500000000000000),
+		true}, // simple tan
 
 	{"arcsin(1)",
 		[]string{},
-		big.NewRat(7853981633974483, 5000000000000000), true}, // simple arcsin
+		big.NewRat(7853981633974483, 5000000000000000),
+		true}, // simple arcsin
 
 	{"arccos(1)",
 		[]string{},
-		big.NewRat(0, 1), true}, // simple arcsin
+		big.NewRat(0, 1),
+		true}, // simple arcsin
 
 	{"arctan(1)",
 		[]string{},
-		big.NewRat(7853981633974483, 10000000000000000), true}, // simple arcsin
+		big.NewRat(7853981633974483, 10000000000000000),
+		true}, // simple arcsin
 
 	{"sqrt(9)",
 		[]string{},
-		big.NewRat(3, 1), true}, // simple sqrt
+		big.NewRat(3, 1),
+		true}, // simple sqrt
 
 	{"ln(1)",
 		[]string{},
-		big.NewRat(0, 1), true}, // simple ln
+		big.NewRat(0, 1),
+		true}, // simple ln
 
 	{"1 = 1",
 		[]string{},
@@ -216,15 +257,18 @@ var testsEval = []struct {
 
 	{"1 == 1",
 		[]string{},
-		big.NewRat(1, 1), true}, // check for valid operator
+		big.NewRat(1, 1),
+		true}, // check for valid operator
 
 	{".5 * 2",
 		[]string{},
-		big.NewRat(1, 1), true}, // no leading zero
+		big.NewRat(1, 1),
+		true}, // no leading zero
 
 	{"1. * 2",
 		[]string{},
-		big.NewRat(2, 1), true}, // no trailing numbers
+		big.NewRat(2, 1),
+		true}, // no trailing numbers
 
 	{". * 2",
 		[]string{},
@@ -232,7 +276,8 @@ var testsEval = []struct {
 
 	{"2*6**3+4**6",
 		[]string{},
-		big.NewRat(4528, 1), true},
+		big.NewRat(4528, 1),
+		true},
 }
 
 func TestEval(t *testing.T) {
