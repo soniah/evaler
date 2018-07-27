@@ -24,7 +24,7 @@ var whitespace_rx = regexp.MustCompile(`\s+`)
 
 var symbolTable map[string]string // TODO used as a mutable global variable!!
 
-// Operator '@' means unary minus TODO ** is also a valid operator
+// Operator '@' means unary minus
 var operators = []string{"-", "+", "*", "/", "<", ">", "@", "^", "**", "%", "!=", "==", ">=", "<="}
 
 // prec returns the operator's precedence
