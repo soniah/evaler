@@ -17,22 +17,22 @@ var testsEval = []struct {
 	ok     bool
 }{
 	{"5 + 2",
-		[]string{},
+		[]string{"5", "+", "2"},
 		big.NewRat(7, 1),
 		true}, // simple plus
 
 	{"5 - 2",
-		[]string{},
+		[]string{"5", "-", "2"},
 		big.NewRat(3, 1),
 		true}, // simple minus
 
 	{"5 * 2",
-		[]string{},
+		[]string{"5", "*", "2"},
 		big.NewRat(10, 1),
 		true}, // simple multiply
 
 	{"5 / 2",
-		[]string{},
+		[]string{"5", "/", "2"},
 		big.NewRat(5, 2),
 		true}, // simple divide
 
