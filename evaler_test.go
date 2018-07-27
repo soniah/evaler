@@ -300,7 +300,7 @@ func TestTokenise(t *testing.T) {
 func TestEval(t *testing.T) {
 	for i, test := range testsEval {
 
-		if i != 18 { // case 18 onwards is breaking
+		if i != 19 {
 			continue
 		}
 

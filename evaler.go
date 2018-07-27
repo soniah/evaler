@@ -25,7 +25,7 @@ var whitespace_rx = regexp.MustCompile(`\s+`)
 var symbolTable map[string]string // TODO used as a mutable global variable!!
 
 // Operator '@' means unary minus TODO ** is also a valid operator
-var operators = []string{"-", "+", "*", "/", "<", ">", "@", "^", "%", "!=", "==", ">=", "<="}
+var operators = []string{"-", "+", "*", "/", "<", ">", "@", "^", "**", "%", "!=", "==", ">=", "<="}
 
 // prec returns the operator's precedence
 func prec(op string) (result int) {
@@ -89,11 +89,11 @@ func convert2postfix(tokens []string) []string {
 	var stack stack.Stack
 	var result []string
 	for _, token := range tokens {
-		stackString := fmt.Sprint(stack) // HACK - for debugging
+
+		stackString := fmt.Sprint(stack) // HACK - debugging
 		stackString += ""                // HACK - debugging
 
 		if isOperator(token) {
-
 		OPERATOR:
 			for {
 				top, err := stack.Top()
@@ -167,12 +167,17 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 	var stack stack.Stack
 	result := new(big.Rat) // note: a new(big.Rat) has value "0/1" ie zero
 	for _, token := range postfix {
+
+		stackString := fmt.Sprint(stack) // HACK - debugging
+		stackString += ""                // HACK - debugging
+
 		if isOperand(token) {
 			bigrat := new(big.Rat)
 			if _, err := fmt.Sscan(token, bigrat); err != nil {
 				return nil, fmt.Errorf("unable to scan %s", token)
 			}
 			stack.Push(bigrat)
+
 		} else if isOperator(token) {
 
 			op2, err2 := stack.Pop()
@@ -190,7 +195,7 @@ func evaluatePostfix(postfix []string) (*big.Rat, error) {
 
 			dummy := new(big.Rat)
 			switch token {
-			case "**": // TODO + case "^"
+			case "**", "^":
 				float1 := BigratToFloat(op1.(*big.Rat))
 				float2 := BigratToFloat(op2.(*big.Rat))
 				float_result := math.Pow(float1, float2)

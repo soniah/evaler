@@ -26,7 +26,7 @@ type Stack []interface{}
 func (s Stack) String() string {
 	var result string
 	for _, value := range s {
-		result += fmt.Sprintf("%s | ", value)
+		result += fmt.Sprintf("%s  |  ", value)
 	}
 	return result
 }
