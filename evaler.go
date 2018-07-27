@@ -346,6 +346,8 @@ func Eval(expr string) (result *big.Rat, err error) {
 	return evaluatePostfix(postfix)
 }
 
+// EvalWithVariables allows variables to be passed into expressions, for
+// example evaluate "x + 1" where x=5
 func EvalWithVariables(expr string, variables map[string]string) (result *big.Rat, err error) {
 	symbolTable = variables
 	s := ""

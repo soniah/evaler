@@ -13,10 +13,10 @@ import (
 // -----------------------------------------------------------------------------
 
 var testsEval = []struct {
-	in     string
-	tokens []string
-	out    *big.Rat
-	ok     bool
+	in     string   // input expression
+	tokens []string // expected tokenisation
+	out    *big.Rat // expected result
+	ok     bool     // or false if expected to fail
 }{
 	{"5 + 2",
 		[]string{"5", "+", "2"},
@@ -300,12 +300,6 @@ func TestTokenise(t *testing.T) {
 
 func TestEval(t *testing.T) {
 	for i, test := range testsEval {
-
-		/*
-		if i != 50 {
-			continue
-		}
-		*/
 
 		ret, err := evaler.Eval(test.in)
 		if ret == nil && test.out == nil {

@@ -25,14 +25,16 @@ Operators
 
 The operators supported are:
 
-```+ - * / ** () < >```
+```+ - * / ^ ** () < > <= >= == !=```
 
-`<` (less than) and `>` (greater than) get lowest precedence, all other
-precedence is as expected -
+(`^` and `**` are both exponent operators)
+
+Logical operators like `<` (less than) or `>` (greater than) get lowest precedence,
+all other precedence is as expected -
 [BODMAS](http://www.mathsisfun.com/operation-order-bodmas.html).
 
-`<` and `>` tests will evaluate to 0.0 for false and 1.0 for true, allowing
-expressions like:
+Logical tests like `<` and `>` tests will evaluate to 0.0 for false and 1.0
+for true, allowing expressions like:
 
 ```
 3 * (1 < 2) # returns 3.0
@@ -59,6 +61,14 @@ sin(1)+2**2
 ```
 
 See `evaler_test.go` for more examples of using trigonometric operators.
+
+Variables
+---------
+
+`EvalWithVariables()` allows variables to be passed into expressions,
+for example evaluate `"x + 1"`, where `x=5`.
+
+See `evaler_test.go` for more examples of using variables.
 
 Issues
 ------
