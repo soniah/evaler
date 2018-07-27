@@ -37,7 +37,6 @@ func prec(op string) (result int) {
 		result = 3
 	} else if op == "@" {
 		result = 4
-		// WAS } else if functions_rx.MatchString(op) {
 	} else if functions_rx.MatchString(op) {
 		result = 5
 	} else {
@@ -54,11 +53,6 @@ func opGTE(op1, op2 string) bool {
 func isFunction(token string) bool {
 	return functions_rx.MatchString(token)
 }
-
-// WAS isOperator returns true if token is an operator
-//func isOperator(token string) bool {
-//	return strings.Contains(operators, token)
-//}
 
 // isOperator returns true if token is an operator
 func isOperator(token string) bool {
@@ -322,8 +316,6 @@ func Tokenise(expr string) []string {
 
 	stripped := whitespace_rx.ReplaceAllString(strings.TrimSpace(spaced), "|")
 	result := strings.Split(stripped, "|")
-	//fmt.Fprintf(os.Stderr, "%#v\n%#v,\n\n", expr, result)
-
 	return result
 }
 

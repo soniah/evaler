@@ -78,6 +78,8 @@ for `big.Rat` numbers is non-trivial. As a work around, arguments are converted
 to float64's, the calculation is done using the `math.Pow()` function, the
 result is converted to a `big.Rat` and placed back on the stack.
 
+* floating point numbers missing leading digits (like `".5 * 2"`) are failing - PR's welcome
+
 Documentation
 -------------
 
