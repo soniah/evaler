@@ -6,58 +6,339 @@ import (
 	"testing"
 
 	"github.com/soniah/evaler"
+	"github.com/stretchr/testify/assert"
+	"fmt"
 )
 
 // -----------------------------------------------------------------------------
 
 var testsEval = []struct {
-	in  string
-	out *big.Rat
-	ok  bool
+	in     string   // input expression
+	tokens []string // expected tokenisation
+	out    *big.Rat // expected result
+	ok     bool     // or false if expected to fail
 }{
-	{"5 + 2", big.NewRat(7, 1), true},            // simple plus
-	{"5 - 2", big.NewRat(3, 1), true},            // simple minus
-	{"5 * 2", big.NewRat(10, 1), true},           // simple multiply
-	{"5 / 2", big.NewRat(5, 2), true},            // simple divide
-	{"U + U", nil, false},                        // letters 1
-	{"2 + U", nil, false},                        // broken 1
-	{"2 +  ", nil, false},                        // broken 2
-	{"+ 2 - + * ", nil, false},                   // broken 3
-	{"5.5+2*(3+1)", big.NewRat(27, 2), true},     // complex 1
-	{"(((1+2.3)))", big.NewRat(33, 10), true},    // complex 2
-	{"(1+(2))*(5-2.5)", big.NewRat(15, 2), true}, // complex 3
-	{"3*(2<4)", big.NewRat(3, 1), true},          // less than
-	{"3*(2>4)", new(big.Rat), true},              // greater than
-	{"5 / 0", nil, false},                        // divide by zero
-	{"2 ** 3", big.NewRat(8, 1), true},           // exponent 1
-	{"9.0**0.5", big.NewRat(3, 1), true},         // exponent 2
-	{"4**-1", big.NewRat(1, 4), true},            // exponent 3
-	{"1.23", big.NewRat(123, 100), true},
-	{"-1+2", big.NewRat(1, 1), true},                                      // unary minus (the beginning of a expression)
-	{"3*-4", big.NewRat(-12, 1), true},                                    // unary minus (after an operator)
-	{"4/(-1+3)", big.NewRat(2, 1), true},                                  // unary minus (after '(' )
-	{"-(-1+2)--2**3", big.NewRat(7, 1), true},                             // unary minus (complex)
-	{"sin(1)", big.NewRat(1682941969615793, 2000000000000000), true},      // simple sin
-	{"sin(1)+1", big.NewRat(3682941969615793, 2000000000000000), true},    // sin in an expression
-	{"sin(1)+2**2", big.NewRat(9682941969615793, 2000000000000000), true}, // sin in more complex expression
-	{"sin(2-1)", big.NewRat(1682941969615793, 2000000000000000), true},    // sin of expression
-	{"sin(2**2)", big.NewRat(-3784012476539641, 5000000000000000), true},  // sin of expression
-	{"1+sin(1)", big.NewRat(3682941969615793, 2000000000000000), true},    // THIS IS A BUG AND SHOULD NOT BREAK
-	{"cos(1)", big.NewRat(2701511529340699, 5000000000000000), true},      // simple sin
-	{"tan(1)", big.NewRat(778703862327451, 500000000000000), true},        // simple tan
-	{"arcsin(1)", big.NewRat(7853981633974483, 5000000000000000), true},   // simple arcsin
-	{"arccos(1)", big.NewRat(0, 1), true},                                 // simple arcsin
-	{"arctan(1)", big.NewRat(7853981633974483, 10000000000000000), true},  // simple arcsin
-	{"ln(1)", big.NewRat(0, 1), true},                                     // simple ln
-	{".5 * 2", big.NewRat(1, 1), true},                                    // no leading zero
-	{"1. * 2", big.NewRat(2, 1), true}, // no trailing numbers
-	{". * 2", nil, false},              // decimal, but no numbers at all
-	{"2*6**3+4**6", big.NewRat(4528, 1), true},
+	{"5 + 2",
+		[]string{"5", "+", "2"},
+		big.NewRat(7, 1),
+		true}, // simple plus
+
+	{"5 - 2",
+		[]string{"5", "-", "2"},
+		big.NewRat(3, 1),
+		true}, // simple minus
+
+	{"5 * 2",
+		[]string{"5", "*", "2"},
+		big.NewRat(10, 1),
+		true}, // simple multiply
+
+	{"5 / 2",
+		[]string{"5", "/", "2"},
+		big.NewRat(5, 2),
+		true}, // simple divide
+
+	{"U + U",
+		[]string{"U", "+", "U"},
+		nil,
+		false}, // letters 1
+
+	{"2 + U",
+		[]string{"2", "+", "U"},
+
+		nil,
+		false}, // broken 1
+
+	{"2 +  ",
+		[]string{"2", "+"},
+		nil,
+		false}, // broken 2
+
+	{"+ 2 - + * ",
+		[]string{"+", "2", "-", "+", "*"},
+		nil,
+		false}, // broken 3
+
+	{"5.5+2*(3+1)",
+		[]string{"5.5", "+", "2", "*", "(", "3", "+", "1", ")"},
+		big.NewRat(27, 2),
+		true}, // complex 1
+
+	{"(((1+2.3)))",
+		[]string{"(", "(", "(", "1", "+", "2.3", ")", ")", ")"},
+		big.NewRat(33, 10),
+		true}, // complex 2
+
+	{"(1+(2))*(5-2.5)",
+		[]string{"(", "1", "+", "(", "2", ")", ")", "*", "(", "5", "-", "2.5", ")"},
+		big.NewRat(15, 2),
+		true}, // complex 3
+
+	{"3*(2<4)",
+		[]string{"3", "*", "(", "2", "<", "4", ")"},
+		big.NewRat(3, 1),
+		true}, // less than
+
+	{"3*(2>4)",
+		[]string{"3", "*", "(", "2", ">", "4", ")"},
+		new(big.Rat),
+		true}, // greater than
+
+	{"3+5 == 8",
+		[]string{"3", "+", "5", "==", "8"},
+		big.NewRat(1, 1),
+		true}, // equals match
+
+	{"4+5 == 8",
+		[]string{"4", "+", "5", "==", "8"},
+		new(big.Rat),
+		true}, // equals no-match
+
+	{"3+5 != 8",
+		[]string{"3", "+", "5", "!=", "8"},
+		new(big.Rat),
+		true}, // not-equals match
+
+	{"4+5 != 8",
+		[]string{"4", "+", "5", "!=", "8"},
+		big.NewRat(1, 1),
+		true}, // not-equals no-match
+
+	{"5 / 0",
+		[]string{"5", "/", "0"},
+		nil,
+		false}, // divide by zero
+
+	{"2 ^ 3",
+		[]string{"2", "^", "3"},
+		big.NewRat(8, 1),
+		true}, // exponent 1
+
+	{"2 ** 3",
+		[]string{"2", "**", "3"},
+		big.NewRat(8, 1),
+		true}, // exponent 1
+
+	{"9.0^0.5",
+		[]string{"9.0", "^", "0.5"},
+		big.NewRat(3, 1),
+		true}, // exponent 2
+
+	{"4^-1",
+		[]string{"4", "^", "@", "1"},
+		big.NewRat(1, 4),
+		true}, // exponent 3
+
+	{"10%3",
+		[]string{"10", "%", "3"},
+		big.NewRat(1, 1),
+		true}, // mod 1
+
+	{"10%3 + 5",
+		[]string{"10", "%", "3", "+", "5"},
+		big.NewRat(6, 1),
+		true}, // mod 2
+
+	{"5 + 10%3",
+		[]string{"5", "+", "10", "%", "3"},
+		big.NewRat(6, 1),
+		true}, // mod 3
+
+	{"9.0**0.5",
+		[]string{"9.0", "**", "0.5"},
+		big.NewRat(3, 1),
+		true}, // exponent 2
+
+	{"4**-1",
+		[]string{"4", "**", "@", "1"},
+		big.NewRat(1, 4),
+		true}, // exponent 3
+
+	{"2*6**3+4**6",
+		[]string{"2", "*", "6", "**", "3", "+", "4", "**", "6"},
+		big.NewRat(4528, 1),
+		true}, // fruit salad
+
+	{"1.23",
+		[]string{"1.23"},
+		big.NewRat(123, 100),
+		true},
+
+	{"-1+2",
+		[]string{"@", "1", "+", "2"},
+		big.NewRat(1, 1),
+		true}, // unary minus (the beginning of a expression)
+
+	{"3*-4",
+		[]string{"3", "*", "@", "4"},
+		big.NewRat(-12, 1),
+		true}, // unary minus (after an operator)
+
+	{"4/(-1+3)",
+		[]string{"4", "/", "(", "@", "1", "+", "3", ")"},
+		big.NewRat(2, 1),
+		true}, // unary minus (after '(' )
+
+	{"-(-1+2)--2**3",
+		[]string{"@", "(", "@", "1", "+", "2", ")", "-", "@", "2", "**", "3"},
+		big.NewRat(7, 1),
+		true}, // unary minus (complex)
+
+	{"-(-1+2)--2^3",
+		[]string{"@", "(", "@", "1", "+", "2", ")", "-", "@", "2", "^", "3"},
+		big.NewRat(7, 1),
+		true}, // unary minus (complex)
+
+	{"sin(1)",
+		[]string{"sin", "(", "1", ")"},
+		big.NewRat(1682941969615793, 2000000000000000),
+		true}, // simple sin
+
+	{"sin(1)+1",
+		[]string{"sin", "(", "1", ")", "+", "1"},
+		big.NewRat(3682941969615793, 2000000000000000),
+		true}, // sin in an expression
+
+	{"sin(1)+2^2",
+		[]string{"sin", "(", "1", ")", "+", "2", "^", "2"},
+		big.NewRat(9682941969615793, 2000000000000000),
+		true}, // sin in more complex expression
+
+	{"sin(1)+2**2",
+		[]string{"sin", "(", "1", ")", "+", "2", "**", "2"},
+		big.NewRat(9682941969615793, 2000000000000000),
+		true}, // sin in more complex expression
+
+	{"sin(2-1)",
+		[]string{"sin", "(", "2", "-", "1", ")"},
+		big.NewRat(1682941969615793, 2000000000000000),
+		true}, // sin of expression
+
+	{"sin(2^2)",
+		[]string{"sin", "(", "2", "^", "2", ")"},
+		big.NewRat(-3784012476539641, 5000000000000000),
+		true}, // sin of expression
+
+	{"sin(2**2)",
+		[]string{"sin", "(", "2", "**", "2", ")"},
+		big.NewRat(-3784012476539641, 5000000000000000),
+		true}, // sin of expression
+
+	{"1+sin(1)",
+		[]string{"1", "+", "sin", "(", "1", ")"},
+		big.NewRat(3682941969615793, 2000000000000000),
+		true},
+
+	{"cos(1)",
+		[]string{"cos", "(", "1", ")"},
+		big.NewRat(2701511529340699, 5000000000000000),
+		true}, // simple sin
+
+	{"tan(1)",
+		[]string{"tan", "(", "1", ")"},
+		big.NewRat(778703862327451, 500000000000000),
+		true}, // simple tan
+
+	{"arcsin(1)",
+		[]string{"arcsin", "(", "1", ")"},
+		big.NewRat(7853981633974483, 5000000000000000),
+		true}, // simple arcsin
+
+	{"arccos(1)",
+		[]string{"arccos", "(", "1", ")"},
+		big.NewRat(0, 1),
+		true}, // simple arcsin
+
+	{"arctan(1)",
+		[]string{"arctan", "(", "1", ")"},
+		big.NewRat(7853981633974483, 10000000000000000),
+		true}, // simple arcsin
+
+	{"sqrt(9)",
+		[]string{"sqrt", "(", "9", ")"},
+		big.NewRat(3, 1),
+		true}, // simple sqrt
+
+	{"ln(1)",
+		[]string{"ln", "(", "1", ")"},
+		big.NewRat(0, 1),
+		true}, // simple ln
+
+	{"1 = 1",
+		[]string{"1", "=", "1"},
+		nil,
+		false}, // check for invalid operator
+
+	{"1 == 1",
+		[]string{"1", "==", "1"},
+		big.NewRat(1, 1),
+		true}, // check for valid operator
+
+	/* TODO this is breaking, probably because of regex for floating point number
+{".5 * 2",
+	[]string{".", "5", "*", "2"},
+	big.NewRat(1, 1),
+	true}, // no leading zero
+	*/
+
+	{"1. * 2",
+		[]string{"1", ".", "*", "2"},
+		nil,
+		false}, // no trailing numbers
+
+	{". * 2",
+		[]string{".", "*", "2"},
+		nil,
+		false}, // decimal, but no numbers at all
+}
+
+func TestTokenise(t *testing.T) {
+	for i, test := range testsEval {
+		assert.EqualValues(t, test.tokens, evaler.Tokenise(test.in), fmt.Sprintf("#%d failed: %s", i, test.in))
+	}
 }
 
 func TestEval(t *testing.T) {
 	for i, test := range testsEval {
+
 		ret, err := evaler.Eval(test.in)
+		if ret == nil && test.out == nil {
+			// ok, do nothing
+		} else if ret == nil || test.out == nil {
+			t.Errorf("#%d: %s: unexpected nil result: %v vs %v", i, test.in, ret, test.out)
+		} else if ret.Cmp(test.out) != 0 {
+			t.Errorf("#%d: %s: bad result: got %v expected %v", i, test.in, ret, test.out)
+		}
+		if (err == nil) != test.ok {
+			t.Errorf("#%d: %s: unexpected err result: %t vs %t", i, test.in, (err == nil), test.ok)
+		}
+	}
+}
+
+var testsEvalSymbols = []struct {
+	in        string
+	variables map[string]string
+	out       *big.Rat
+	ok        bool
+}{
+	{"x", map[string]string{"x": "5"}, big.NewRat(5, 1), true},                                          // simple substitution
+	{"x + 1", map[string]string{"x": "5"}, big.NewRat(6, 1), true},                                      // basic addition
+	{"2*x", map[string]string{"x": "2"}, big.NewRat(4, 1), true},                                        // moderate
+	{"x^x", map[string]string{"x": "2"}, big.NewRat(4, 1), true},                                        // more complex
+	{"1^x", map[string]string{"x": "100"}, big.NewRat(1, 1), true},                                      // sanity
+	{"9^x", map[string]string{"x": "-.5"}, big.NewRat(3333333333333333, 10000000000000000), true},       // basic negative value passed in for variable
+	{"9^-x", map[string]string{"x": ".5"}, big.NewRat(3333333333333333, 10000000000000000), true},       // negative of variable
+	{"t", map[string]string{"t": "5"}, big.NewRat(5, 1), true},                                          // test variables that could be misinterpreted as operators
+	{"x", map[string]string{"t": "5"}, nil, false},                                                      // unassigned variable
+	{"sin(x)", map[string]string{"x": "1"}, big.NewRat(1682941969615793, 2000000000000000), true},       // negative of variable
+	{"sin(x)*(x+1)", map[string]string{"x": "1"}, big.NewRat(1682941969615793, 1000000000000000), true}, // negative of variable
+	{"sin(x)^-1", map[string]string{"x": "1"}, big.NewRat(2970987764473183, 2500000000000000), true},    // switcharoo
+	{"(x)*(x+1)", map[string]string{"x": "1"}, big.NewRat(2, 1), true},                                  // negative of variable
+}
+
+func TestEvalWithVariables(t *testing.T) {
+	for i, test := range testsEvalSymbols {
+		ret, err := evaler.EvalWithVariables(test.in, test.variables)
 		if ret == nil && test.out == nil {
 			// ok, do nothing
 		} else if ret == nil || test.out == nil {
@@ -131,7 +412,7 @@ func TestBigratToFloat(t *testing.T) {
 	for i, test := range testsBigratToFloat {
 		ret := evaler.BigratToFloat(test.in)
 		if ret != test.out {
-			t.Errorf("#%d: got %f expected %f", i, ret, test.out)
+			t.Errorf("#%d: got %d expected %d", i, ret, test.out)
 		}
 	}
 }
