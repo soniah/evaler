@@ -33,7 +33,7 @@ func prec(op string) (result int) {
 		result = 1
 	} else if op == "*" || op == "/" {
 		result = 2
-	} else if op == "^" || op == "%" {
+	} else if op == "^" || op == "%" || op == "**" {
 		result = 3
 	} else if op == "@" {
 		result = 4

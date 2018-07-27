@@ -300,9 +300,11 @@ func TestTokenise(t *testing.T) {
 func TestEval(t *testing.T) {
 	for i, test := range testsEval {
 
-		if i != 19 {
+		/*
+		if i != 31 {
 			continue
 		}
+		*/
 
 		ret, err := evaler.Eval(test.in)
 		if ret == nil && test.out == nil {
